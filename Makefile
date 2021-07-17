@@ -8,4 +8,4 @@ lint:
 	npx eslint .
 
 build:
-	npx webpack
+	npm run build
