@@ -1,5 +1,6 @@
 export default {
   translation: {
+    appName: 'RSS Агрегатор',
     button: {
       urlAdd: 'Добавить',
     },
@@ -14,8 +15,9 @@ export default {
         validation: 'Ссылка должна быть валидным URL',
         network: 'Нет интернета или ресурс недоступен',
       },
-      example: 'Пример: {{ link }}',
+      exampleText: 'Пример: ',
       exampleLink: 'https://ru.hexlet.io/lessons.rss',
+      inputPlaceholder: 'Ссылка RSS',
     },
   },
 };

@@ -1,4 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import headerContainerEl from './components/header.js';
+import run from './app.js';
 
-document.body.append(headerContainerEl);
+run(document.body).catch(console.error);
