@@ -12,9 +12,10 @@ import Hwp from 'html-webpack-plugin';
 
 export default {
   mode: process.env.NODE_ENV || 'development',
+  watch: true,
   plugins: [
     new Hwp({
-      title: 'RSS Aggregator',
+      template: 'src/index.html',
     }),
   ],
   output: {
