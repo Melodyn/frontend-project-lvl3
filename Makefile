@@ -5,7 +5,7 @@ dependency:
 
 # dev
 serve:
-	npm run build -- --watch
+	NODE_ENV=development npm run build -- --watch
 
 lint:
 	npx eslint .

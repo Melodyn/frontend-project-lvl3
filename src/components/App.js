@@ -10,7 +10,7 @@ export default class App {
   }
 
   init(state) {
-    htmlEl.setAttribute('lang', state.lng);
+    htmlEl.setAttribute('lang', state.app.lng);
     titleEl.textContent = this.t('appName');
   }
 

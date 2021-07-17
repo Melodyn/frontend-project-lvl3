@@ -4,14 +4,18 @@ import App from './components/App.js';
 
 const run = async (body) => {
   const state = {
-    lng: 'ru',
+    app: {
+      env: process.env.NODE_ENV,
+      isProd: process.env.NODE_ENV === 'production',
+      lng: 'ru',
+    },
   };
 
   const i18n = i18next.createInstance();
   const t = i18n.t.bind(i18n);
 
   return i18n
-    .init({ lng: 'ru', debug: true, resources })
+    .init({ lng: state.app.lng, debug: !state.app.isProd, resources })
     .then(() => {
       const app = new App(t);
       app.init(state);
