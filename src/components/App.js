@@ -12,14 +12,14 @@ export default class App {
   init(state) {
     htmlEl.setAttribute('lang', state.app.lng);
     titleEl.textContent = this.t('appName');
+    this.header.init();
   }
 
   render(body) {
-    this.header.init();
-    const { headerContainer, rssForm } = this.header.getElements();
+    const headerEls = this.header.getElements();
 
-    body.append(headerContainer);
+    body.append(headerEls.container);
 
-    rssForm.input.focus();
+    headerEls.form.input.focus();
   }
 }
