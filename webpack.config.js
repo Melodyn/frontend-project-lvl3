@@ -3,7 +3,9 @@ import Hwp from 'html-webpack-plugin';
 export default {
   mode: process.env.NODE_ENV,
   plugins: [
-    new Hwp(),
+    new Hwp({
+      favicon: './src/icon.ico',
+    }),
   ],
   output: {
     clean: true,
