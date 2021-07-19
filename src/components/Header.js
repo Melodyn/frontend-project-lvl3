@@ -12,19 +12,16 @@ export default class Header {
   constructor(t) {
     this.t = t;
     this.form = new Form(t);
-    this.elements = elements;
+    this.elements = {
+      ...elements,
+      form: this.form.getElements(),
+    };
   }
 
-  init() {
+  init(view) {
+    this.form.init(view);
+
     this.elements.appName.textContent = this.t('appName');
-
-    this.form.init();
-    const formEls = this.form.getElements();
-    this.elements.form = formEls;
-    this.elements.container.append(this.elements.appName, formEls.form);
-  }
-
-  getElements() {
-    return this.elements;
+    this.elements.container.append(this.elements.appName, this.elements.form.form);
   }
 }

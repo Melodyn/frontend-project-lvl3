@@ -1,13 +1,21 @@
 import i18next from 'i18next';
 import resources from './locales/index.js';
+import initView from './view.js';
 import App from './components/App.js';
 
-const run = async (body) => {
+const run = async () => {
   const state = {
     app: {
       env: process.env.NODE_ENV,
       isProd: (process.env.NODE_ENV === 'production'),
       lng: 'ru',
+    },
+    streams: new Map([]),
+    uiState: {
+      form: {
+        state: 'ready',
+        errorStep: null,
+      },
     },
   };
 
@@ -18,8 +26,9 @@ const run = async (body) => {
     .init({ lng: state.app.lng, debug: !state.app.isProd, resources })
     .then(() => {
       const app = new App(t);
-      app.init(state);
-      app.render(body);
+      const view = initView(state, app);
+      app.init(view);
+      app.header.form.renderEmpty();
     });
 };
 

@@ -12,8 +12,12 @@ export default {
         success: 'Успешно загружено',
       },
       error: {
-        validation: 'Ссылка должна быть валидным URL',
-        network: 'Нет интернета или ресурс недоступен',
+        validation: {
+          url: 'Ссылка должна быть валидным URL',
+          unique: 'Такой ресурс уже загружен',
+        },
+        loading: 'Нет интернета или ресурс недоступен',
+        parsing: 'Ресурс не содержит валидный RSS',
       },
       exampleText: 'Пример: ',
       exampleLink: 'https://ru.hexlet.io/lessons.rss',
