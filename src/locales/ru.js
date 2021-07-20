@@ -3,6 +3,7 @@ export default {
     appName: 'RSS Агрегатор',
     button: {
       urlAdd: 'Добавить',
+      show: 'Просмотр',
     },
     form: {
       status: {
@@ -21,6 +22,10 @@ export default {
       exampleText: 'Пример: ',
       exampleLink: 'https://ru.hexlet.io/lessons.rss',
       inputPlaceholder: 'Ссылка RSS',
+    },
+    reader: {
+      feeds: 'Фиды',
+      posts: 'Посты',
     },
   },
 };
