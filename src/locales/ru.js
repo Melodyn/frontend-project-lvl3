@@ -7,8 +7,7 @@ export default {
     form: {
       status: {
         ready: 'Готов к работе',
-        validation: 'Проверяю ссылку',
-        loading: 'Получаю данные',
+        processing: 'Проверяю, качаю, подготавливаю...',
         success: 'Успешно загружено',
       },
       error: {

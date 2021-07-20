@@ -7,9 +7,9 @@ const elements = {
 };
 
 export default class App {
-  constructor(t) {
-    this.t = t;
-    this.header = new Header(t);
+  constructor(services) {
+    this.t = services.i18n;
+    this.header = new Header(services);
     this.elements = {
       ...elements,
       header: this.header.elements,

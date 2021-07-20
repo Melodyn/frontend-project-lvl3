@@ -9,9 +9,9 @@ const elements = {
 };
 
 export default class Header {
-  constructor(t) {
-    this.t = t;
-    this.form = new Form(t);
+  constructor(services) {
+    this.t = services.i18n;
+    this.form = new Form(services);
     this.elements = {
       ...elements,
       form: this.form.elements,

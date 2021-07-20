@@ -4,16 +4,15 @@ const view = (initState, app) => {
   const { form } = app.header;
 
   const formHandler = () => {
-    const { state, errorStep } = initState.uiState.form;
+    const { state, errorType } = initState.uiState.form;
     switch (state) {
       case 'ready':
       case 'success':
         return form.renderEmpty(state);
-      case 'validation':
-      case 'loading':
-        return form.renderProcess(state);
+      case 'processing':
+        return form.renderProcess();
       case 'error':
-        return form.renderError(errorStep);
+        return form.renderError(errorType);
       default:
         throw new Error(`Unexpected form state "${state}"`);
     }

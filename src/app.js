@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import resources from './locales/index.js';
 import initView from './view.js';
 import App from './components/App.js';
+import { createRSSFeeder } from './helpers.js';
 
 const run = async () => {
   const state = {
@@ -10,11 +11,10 @@ const run = async () => {
       isProd: (process.env.NODE_ENV === 'production'),
       lng: 'ru',
     },
-    streams: new Map([]),
     uiState: {
       form: {
         state: 'ready',
-        errorStep: null,
+        errorType: null,
       },
     },
   };
@@ -25,7 +25,10 @@ const run = async () => {
   return i18n
     .init({ lng: state.app.lng, debug: !state.app.isProd, resources })
     .then(() => {
-      const app = new App(t);
+      const app = new App({
+        i18n: t,
+        rssFeeder: createRSSFeeder(),
+      });
       const view = initView(state, app);
       app.init(view);
       app.header.form.renderEmpty();
