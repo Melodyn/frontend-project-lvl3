@@ -14,7 +14,7 @@ export default class Header {
     this.form = new Form(t);
     this.elements = {
       ...elements,
-      form: this.form.getElements(),
+      form: this.form.elements,
     };
   }
 

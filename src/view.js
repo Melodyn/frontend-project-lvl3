@@ -15,7 +15,7 @@ const view = (initState, app) => {
       case 'error':
         return form.renderError(errorStep);
       default:
-        throw new Error(`Unexpected state "${state}"`);
+        throw new Error(`Unexpected form state "${state}"`);
     }
   };
 

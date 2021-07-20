@@ -99,10 +99,6 @@ export default class Form {
     });
   }
 
-  getElements() {
-    return this.elements;
-  }
-
   renderEmpty(stateName = 'ready') {
     this.elements.button.disabled = false;
     this.elements.input.disabled = false;
