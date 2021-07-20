@@ -87,21 +87,20 @@ export const createRSSFeeder = () => {
 
   const emulateAddByUrl = (link) => new Promise((resolve, reject) => {
     setTimeout(() => {
-      try {
-        validate(link);
-      } catch (err) {
-        reject(err);
-      }
-      setTimeout(() => {
-        try {
-          const data = link.includes('rss') ? fixtures.valid : fixtures.invalid;
-          const parsedData = parse(data);
-          feeds.set(link, parsedData);
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      }, 2000);
+      validate(link)
+        .then(() => {
+          setTimeout(() => {
+            try {
+              const data = link.includes('rss') ? fixtures.valid : fixtures.invalid;
+              const parsedData = parse(data);
+              feeds.set(link, parsedData);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          }, 2000);
+        })
+        .catch((err) => reject(err));
     }, 2000);
   });
 
