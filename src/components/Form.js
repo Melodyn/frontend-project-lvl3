@@ -65,6 +65,7 @@ export default class Form {
       const url = form.get('url');
 
       view.uiState.form.state = 'validation';
+      // new URL(url); // валидация
 
       if (view.streams.has(url)) {
         setTimeout(() => {
@@ -110,15 +111,16 @@ export default class Form {
     this.elements.input.focus();
     this.elements.formStatus.textContent = this.t(`form.status.${stateName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
-    this.elements.formStatus.classList.add('text-primary');
+    this.elements.formStatus.classList.add('text-success');
   }
 
   renderProcess(stepName) {
     this.elements.button.disabled = true;
     this.elements.input.disabled = true;
+    this.elements.input.classList.remove('is-invalid');
     this.elements.formStatus.textContent = this.t(`form.status.${stepName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
-    this.elements.formStatus.classList.add('text-success');
+    this.elements.formStatus.classList.add('text-primary');
   }
 
   renderError(stepName) {
