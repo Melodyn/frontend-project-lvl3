@@ -4,7 +4,7 @@ import Feeds from './Feeds.js';
 
 const elements = {
   container: createElement('div', {
-    classes: ['container'],
+    classes: ['container', 'pb-5'],
   }),
   row: createElement('div', {
     classes: ['row'],
