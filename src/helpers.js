@@ -21,6 +21,27 @@ const fixtures = {
   invalid: 'hello, world',
 };
 
+const rssToObj = (rootElement) => {
+  const iter = (element, accum) => {
+    const key = element.tagName;
+    const value = (element.children.length === 0)
+      ? element.textContent
+      : Array.from(element.children).reduce((acc, item) => iter(item, acc), {});
+
+    if (key === 'item') {
+      const items = accum.items || [];
+      items.push(value);
+      accum.items = items;
+    } else {
+      accum[key] = value;
+    }
+
+    return accum;
+  };
+
+  return iter(rootElement, {});
+};
+
 const createParser = () => {
   const parser = new DOMParser();
   return (data) => {
@@ -29,14 +50,8 @@ const createParser = () => {
       throw new AppError(`Data format is not RSS, is ${result.documentElement.tagName}`, 'parsing');
     }
     const channelEl = result.querySelector('channel');
-    const channelTitleEl = channelEl.querySelector('title');
-    const channelDescEl = channelEl.querySelector('description');
 
-    return {
-      name: channelTitleEl.textContent,
-      description: channelDescEl.textContent,
-      items: [],
-    };
+    return rssToObj(channelEl);
   };
 };
 
@@ -59,7 +74,7 @@ export const createRSSFeeder = () => {
     let url;
 
     try {
-      url = (new URL(link)).toString();
+      url = (new URL(link)).toString(); // validation
     } catch (err) {
       throw new AppError(err, 'validation.url');
     }
@@ -82,6 +97,7 @@ export const createRSSFeeder = () => {
   const addByUrl = (link) => load(link)
     .then((rawData) => parse(rawData))
     .then((parsedData) => {
+      console.log(parsedData);
       feeds.set(link, parsedData);
     });
 
@@ -93,6 +109,7 @@ export const createRSSFeeder = () => {
             try {
               const data = link.includes('rss') ? fixtures.valid : fixtures.invalid;
               const parsedData = parse(data);
+              console.log(parsedData);
               feeds.set(link, parsedData);
               resolve();
             } catch (err) {
