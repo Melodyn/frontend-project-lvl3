@@ -1,4 +1,4 @@
-import { createElement } from '../helpers.js';
+import createElement from '../libs/createElement.js';
 import AppError from '../AppError.js';
 
 const formStatusColors = ['text-primary', 'text-success', 'text-danger'];
@@ -37,17 +37,17 @@ const elements = {
 
 export default class Form {
   constructor(services) {
-    this.t = services.i18n;
-    this.elements = elements;
+    this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
+    this.elements = elements;
   }
 
   init(view) {
-    this.elements.button.textContent = this.t('button.urlAdd');
-    this.elements.input.setAttribute('placeholder', this.t('form.inputPlaceholder'));
-    this.elements.exampleText.textContent = this.t('form.exampleText');
-    this.elements.exampleLink.textContent = this.t('form.exampleLink');
-    this.elements.formStatus.textContent = this.t('form.status.ready');
+    this.elements.button.textContent = this.i18n.t('button.urlAdd');
+    this.elements.input.setAttribute('placeholder', this.i18n.t('form.inputPlaceholder'));
+    this.elements.exampleText.textContent = this.i18n.t('form.exampleText');
+    this.elements.exampleLink.textContent = this.i18n.t('form.exampleLink');
+    this.elements.formStatus.textContent = this.i18n.t('form.status.ready');
 
     this.elements.exampleContainer.append(this.elements.exampleText, this.elements.exampleLink);
     this.elements.inputGroup.append(this.elements.input, this.elements.button);
@@ -65,7 +65,7 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       // this.rssFeeder.addByUrl(url)
-      this.rssFeeder.addByUrl(url, 'dev')
+      this.rssFeeder.addByUrl(url, 'fakeMode')
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
@@ -74,6 +74,7 @@ export default class Form {
           if (err instanceof AppError) {
             view.uiState.form.errorType = err.errorType;
           } else {
+            console.error(err);
             view.uiState.form.errorType = 'loading';
           }
           view.uiState.form.state = 'error';
@@ -87,7 +88,7 @@ export default class Form {
     this.elements.input.classList.remove('is-invalid');
     this.elements.form.reset();
     this.elements.input.focus();
-    this.elements.formStatus.textContent = this.t(`form.status.${stateName}`);
+    this.elements.formStatus.textContent = this.i18n.t(`form.status.${stateName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
     this.elements.formStatus.classList.add('text-success');
   }
@@ -96,7 +97,7 @@ export default class Form {
     this.elements.button.disabled = true;
     this.elements.input.disabled = true;
     this.elements.input.classList.remove('is-invalid');
-    this.elements.formStatus.textContent = this.t('form.status.processing');
+    this.elements.formStatus.textContent = this.i18n.t('form.status.processing');
     this.elements.formStatus.classList.remove(...formStatusColors);
     this.elements.formStatus.classList.add('text-primary');
   }
@@ -104,7 +105,7 @@ export default class Form {
   renderError(stepName) {
     this.elements.button.disabled = false;
     this.elements.input.disabled = false;
-    this.elements.formStatus.textContent = this.t(`form.error.${stepName}`);
+    this.elements.formStatus.textContent = this.i18n.t(`form.error.${stepName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
     this.elements.formStatus.classList.add('text-danger');
     this.elements.input.classList.add('is-invalid');

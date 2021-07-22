@@ -1,4 +1,4 @@
-import { createElement } from '../helpers.js';
+import createElement from '../libs/createElement.js';
 
 const createItem = ({ name, description }) => {
   const liEl = createElement('li', {
@@ -29,12 +29,12 @@ const elements = {
 
 export default class Feeds {
   constructor(services) {
-    this.t = services.i18n;
+    this.i18n = services.i18n;
     this.elements = elements;
   }
 
   init() {
-    this.elements.header.textContent = this.t('reader.feeds');
+    this.elements.header.textContent = this.i18n.t('reader.feeds');
     this.elements.container.append(this.elements.header, this.elements.list);
 
     const items = [{ name: 'Hello', description: 'Kitty & Doge' }, { name: 'Goodbye', description: 'World' }];

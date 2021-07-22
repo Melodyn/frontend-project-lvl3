@@ -1,4 +1,4 @@
-import { createElement } from '../helpers.js';
+import createElement from '../libs/createElement.js';
 import Posts from './Posts.js';
 import Feeds from './Feeds.js';
 
@@ -13,7 +13,7 @@ const elements = {
 
 export default class Reader {
   constructor(services) {
-    this.t = services.i18n;
+    this.i18n = services.i18n;
     this.posts = new Posts(services);
     this.feeds = new Feeds(services);
     this.elements = {

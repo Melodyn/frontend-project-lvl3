@@ -1,4 +1,4 @@
-import { createElement } from '../helpers.js';
+import createElement from '../libs/createElement.js';
 import Form from './Form.js';
 
 const elements = {
@@ -10,7 +10,7 @@ const elements = {
 
 export default class Header {
   constructor(services) {
-    this.t = services.i18n;
+    this.i18n = services.i18n;
     this.form = new Form(services);
     this.elements = {
       ...elements,
@@ -21,7 +21,7 @@ export default class Header {
   init(view) {
     this.form.init(view);
 
-    this.elements.appName.textContent = this.t('appName');
+    this.elements.appName.textContent = this.i18n.t('appName');
     this.elements.container.append(this.elements.appName, this.elements.form.form);
   }
 }
