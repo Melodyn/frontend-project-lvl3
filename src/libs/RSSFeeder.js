@@ -6,21 +6,21 @@ const rssToObj = (rootElement) => {
     const key = element.tagName;
     const value = (element.children.length === 0)
       ? element.textContent
-      : Array.from(element.children).reduce((acc, item) => iter(item, acc), {});
+      : Array.from(element.children).reduce((acc, item) => iter(item, acc), new Map());
 
     if (key === 'item') {
-      const items = accum.items || [];
-      items.push(value);
-      accum.items = items;
+      const items = accum.has('items') ? accum.get('items') : [];
+      items.unshift(value);
+      accum.set('items', items);
     } else {
-      accum[key] = value;
+      accum.set(key, value);
     }
 
     return accum;
   };
 
   try {
-    return iter(rootElement, {});
+    return iter(rootElement, new Map());
   } catch (err) {
     throw new AppError(err, 'parsing');
   }
@@ -46,7 +46,19 @@ export default class RSSFeeder {
     this.parser = new DOMParser();
     this.feeds = new Map();
     this.syncPeriod = params.RSS_SYNC_PERIOD;
+    this.listeners = [];
   }
+
+  addByUrl(link, fakeMode = false) {
+    return validate(link, this.feeds)
+      .then(() => this.httpClient.get(link, fakeMode))
+      .then((rawData) => this.parse(rawData))
+      .then((parsedData) => this.feeds.set(link, parsedData))
+      .then(() => this.notify())
+      .then(() => true);
+  }
+
+  // "private"
 
   parse(data) {
     const document = this.parser.parseFromString(data, 'text/xml');
@@ -59,13 +71,13 @@ export default class RSSFeeder {
     return rssToObj(channelEl);
   }
 
-  addByUrl(link, fakeMode = false) {
-    const { feeds } = this;
+  // -- observer
 
-    return validate(link, feeds)
-      .then(() => this.httpClient.get(link, fakeMode))
-      .then((rawData) => this.parse(rawData))
-      .then((parsedData) => feeds.set(link, parsedData))
-      .then(() => true);
+  addUpdateListener(listener) {
+    this.listeners.push(listener);
+  }
+
+  notify() {
+    this.listeners.forEach((listener) => listener(this.feeds));
   }
 }

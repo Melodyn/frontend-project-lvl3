@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 
 const view = (initState, app) => {
-  const { form } = app.header;
+  const { header: { form }, reader } = app;
 
   const formHandler = () => {
     const { state, errorType } = initState.uiState.form;
@@ -18,8 +18,13 @@ const view = (initState, app) => {
     }
   };
 
+  const readerHandler = () => {
+    reader.render();
+  };
+
   return onChange(initState, (path) => {
     if (path === 'uiState.form.state') formHandler();
+    if (path === 'feedsUpdateTimestamp') readerHandler();
   });
 };
 
