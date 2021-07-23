@@ -5,7 +5,7 @@ const elements = {
   container: createElement('div', {
     classes: ['container', 'py-5'],
   }),
-  appName: createElement('h1', { class: 'mb-3' }),
+  appName: createElement('h1', { classes: ['mb-3'] }),
 };
 
 export default class Header {

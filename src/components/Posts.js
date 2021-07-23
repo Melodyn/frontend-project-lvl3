@@ -6,7 +6,7 @@ const createItem = ({ name, visited }, t) => {
   });
   const nameEl = createElement('a', {
     href: '#',
-    ...(visited ? { class: 'text-muted' } : {}),
+    ...(visited ? { classes: ['text-muted'] } : {}),
   }, name);
   const buttonEl = createElement('button', {
     type: 'button',
