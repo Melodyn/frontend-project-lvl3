@@ -13,6 +13,7 @@ const run = async () => {
 
   const state = {
     app: {
+      isProd: (config.NODE_ENV === 'production'),
       lng: 'ru',
     },
     uiState: {
