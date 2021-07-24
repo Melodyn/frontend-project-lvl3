@@ -47,15 +47,42 @@ export default class RSSFeeder {
     this.feeds = new Map();
     this.syncPeriod = params.RSS_SYNC_PERIOD;
     this.listeners = [];
+    this.state = {
+      autoSync: 'stop',
+      loadedFeedsMap: new Map(),
+      fakeMode: false,
+    };
   }
 
   addByUrl(link, fakeMode = false) {
+    this.state.fakeMode = fakeMode;
     return validate(link, this.feeds)
       .then(() => this.httpClient.get(link, fakeMode))
       .then((rawData) => this.parse(rawData))
+      .then((parsedData) => {
+        const items = Array.from(parsedData.get('channel').get('items'));
+        const guids = items.map((item) => item.get('guid'));
+        this.state.loadedFeedsMap.set(link, guids);
+        return parsedData;
+      })
       .then((parsedData) => this.feeds.set(link, parsedData))
       .then(() => this.notify())
       .then(() => true);
+  }
+
+  enableAutoSync() {
+    this.state.autoSync = 'run';
+
+    const sync = () => {
+      setTimeout(() => ((this.state.autoSync === 'run')
+        ? this.updatePosts()
+          .then((hasUpdates) => (hasUpdates ? this.notify() : false))
+          .then(() => sync())
+        : false),
+      this.syncPeriod);
+    };
+
+    sync();
   }
 
   // "private"
@@ -69,6 +96,33 @@ export default class RSSFeeder {
     const channelEl = document.querySelector('channel');
 
     return rssToObj(channelEl);
+  }
+
+  updatePosts() {
+    const newPostPromises = Array.from(this.state.loadedFeedsMap)
+      .map(([feedLink, loadedPostGuids]) => this.httpClient
+        .get(feedLink, this.state.fakeMode)
+        .then((rawData) => this.parse(rawData))
+        .then((parsedData) => {
+          const items = Array.from(parsedData.get('channel').get('items'));
+          return items.filter((item) => !loadedPostGuids.includes(item.get('guid')));
+        })
+        .then((newPosts) => {
+          if (newPosts.length > 0) {
+            const newPostGuids = Array.from(newPosts).map((item) => item.get('guid'));
+            const feed = this.feeds.get(feedLink);
+            const feedItems = feed.get('channel').get('items');
+            feedItems.push(...newPosts);
+            loadedPostGuids.push(...newPostGuids);
+
+            return true;
+          }
+
+          return false;
+        }));
+
+    return Promise.all(newPostPromises)
+      .then((updates) => updates.some((wasUpdated) => wasUpdated));
   }
 
   // -- observer

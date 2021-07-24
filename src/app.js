@@ -42,6 +42,7 @@ const run = async () => {
       rssFeeder.addUpdateListener(() => {
         view.feedsUpdateTimestamp = Date.now();
       });
+      rssFeeder.enableAutoSync();
     });
 };
 

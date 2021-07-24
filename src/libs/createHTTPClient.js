@@ -4,7 +4,7 @@ import fixtures from '../../__fixtures__/rss.js';
 
 const createHTTPClient = (params = {}) => {
   const baseURL = params.RSS_PROXY_URL;
-  const httpClient = axios.create({ baseURL });
+  const httpClient = axios.create({ baseURL, params: { disableCache: true } });
 
   const realClient = (url) => httpClient.get('/get', { params: { url } })
     .then(({ data }) => data.contents)
