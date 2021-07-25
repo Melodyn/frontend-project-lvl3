@@ -1,6 +1,14 @@
 import createHTTPClient from './createHTTPClient.js';
 import AppError from '../AppError.js';
 
+const idGen = () => {
+  let start = 0;
+  return () => {
+    start += 1;
+    return start;
+  };
+};
+
 const rssToObj = (rootElement, feed) => {
   const iter = (element, accum) => {
     const key = element.tagName;
@@ -11,7 +19,7 @@ const rssToObj = (rootElement, feed) => {
     if (key === 'item') {
       const items = accum.has('items') ? accum.get('items') : [];
       value.set('feed', feed);
-      items.unshift(value);
+      items.push(value);
       accum.set('items', items);
     } else {
       accum.set(key, value);
@@ -36,22 +44,29 @@ const validate = async (link, feeds) => {
     throw new AppError(err, 'validation.url');
   }
 
-  if (feeds.has(url.toString())) {
+  const feedsLinks = feeds.map((feed) => feed.get('feed'));
+  if (feedsLinks.includes(url.toString())) {
     throw new AppError('Url not unique', 'validation.unique');
   }
 };
 
 export default class RSSFeeder {
   constructor(params = {}) {
+    this.syncPeriod = params.RSS_SYNC_PERIOD;
+    this.autoSyncState = 'stop';
+
+    this.idGen = idGen();
     this.httpClient = createHTTPClient(params);
+
     this.parser = new DOMParser();
     this.sources = new Map([
-      ['feeds', new Map()],
+      ['feeds', []],
       ['posts', []],
     ]);
-    this.syncPeriod = params.RSS_SYNC_PERIOD;
-    this.listeners = [];
-    this.autoSyncState = 'stop';
+    this.listeners = new Map([
+      ['add.feed', []],
+      ['add.posts', []],
+    ]);
   }
 
   addByUrl(link) {
@@ -64,12 +79,29 @@ export default class RSSFeeder {
       .then((parsedData) => {
         const feed = parsedData.get('channel');
         const feedPosts = Array.from(feed.get('items'));
-        posts.push(...feedPosts);
+
+        return [feed, feedPosts];
+      })
+      .then(([feed, feedPosts]) => {
+        const feedId = this.idGen();
+        const processedPosts = feedPosts.map((post) => {
+          post.set('id', this.idGen());
+          post.set('feedId', feedId);
+          return post;
+        });
+
+        posts.push(...processedPosts);
+        feeds.push(feed);
         feed.delete('items');
         feed.set('feed', link);
-        feeds.set(link, feed);
+        feed.set('id', feedId);
+
+        return [feed, processedPosts];
       })
-      .then(() => this.notify())
+      .then(([feed, feedPosts]) => {
+        this.notify('add.feed', feed);
+        this.notify('add.posts', feedPosts);
+      })
       .then(() => true);
   }
 
@@ -79,8 +111,11 @@ export default class RSSFeeder {
     const sync = () => {
       setTimeout(() => ((this.autoSyncState === 'run')
         ? this.updatePosts()
-          .then((hasUpdates) => (hasUpdates ? this.notify() : false))
           .then(() => sync())
+          .catch((err) => {
+            console.error(err);
+            return sync();
+          })
         : false),
       this.syncPeriod);
     };
@@ -98,13 +133,18 @@ export default class RSSFeeder {
     }
     const channelEl = document.querySelector('channel');
 
-    return rssToObj(channelEl, feed);
+    const parsedFeed = rssToObj(channelEl, feed);
+    const channel = parsedFeed.get('channel');
+    if (!channel.has('items')) {
+      channel.set('items', []);
+    }
+    return parsedFeed;
   }
 
   updatePosts() {
-    const feeds = Array.from(this.sources.get('feeds').keys());
+    const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
-    const postGuidsByFeeds = Array.from(posts).reduce((acc, post) => {
+    const postGuidsByFeeds = posts.reduce((acc, post) => {
       const feed = post.get('feed');
       const guid = post.get('guid');
       if (acc.has(feed)) {
@@ -115,32 +155,44 @@ export default class RSSFeeder {
       return acc;
     }, new Map());
 
-    const newPostPromises = feeds.map((feed) => this.httpClient.get(feed)
-      .then((rawData) => this.parse(rawData, feed))
-      .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
-      .then((allPosts) => {
-        const postGuidsInFeed = postGuidsByFeeds.get(feed);
-        return allPosts.filter((post) => !postGuidsInFeed.includes(post.get('guid')));
-      })
-      .then((newPosts) => {
-        if (newPosts.length > 0) {
-          posts.push(...newPosts);
-          return true;
-        }
-        return false;
-      }));
+    const newPostPromises = feeds.map((feed) => {
+      const feedLink = feed.get('feed');
+      const feedId = feed.get('id');
 
-    return Promise.all(newPostPromises)
-      .then((updates) => updates.some((wasUpdated) => wasUpdated));
+      return this.httpClient.get(feedLink)
+        .then((rawData) => this.parse(rawData, feedLink))
+        .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
+        .then((allPosts) => {
+          const postGuidsInFeed = postGuidsByFeeds.get(feedLink);
+          return allPosts.filter((post) => !postGuidsInFeed.includes(post.get('guid')));
+        })
+        .then((newPosts) => newPosts.map((post) => {
+          post.set('id', this.idGen());
+          post.set('feedId', feedId);
+          return post;
+        }))
+        .then((newPosts) => {
+          if (newPosts.length > 0) {
+            posts.push(...newPosts);
+            this.notify('add.posts', newPosts);
+            return true;
+          }
+          return false;
+        });
+    });
+
+    return Promise.all(newPostPromises);
   }
 
   // -- observer
 
-  addUpdateListener(listener) {
-    this.listeners.push(listener);
+  addEventListener(event, listener) {
+    const listeners = this.listeners.get(event);
+    listeners.push(listener);
   }
 
-  notify() {
-    this.listeners.forEach((listener) => listener(this.feeds));
+  notify(event, data) {
+    const listeners = this.listeners.get(event);
+    listeners.forEach((listener) => listener(data));
   }
 }

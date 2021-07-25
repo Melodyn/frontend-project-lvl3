@@ -1,18 +1,20 @@
 import createElement from '../libs/createElement.js';
 
-const createItem = ({ title, visited, link }, t) => {
+const createItem = (item, buttonText) => {
+  const { title, link } = item;
+
   const liEl = createElement('li', {
     classes: ['list-group-item', 'text-break', 'ps-0', 'py-3'],
   });
   const titleEl = createElement('a', {
     href: link || '#',
     target: '_blank',
-    ...(visited ? { classes: ['text-muted'] } : {}),
+    classes: ['fw-bold'],
   }, title);
   const buttonEl = createElement('button', {
     type: 'button',
-    classes: ['btn', visited ? 'btn-outline-secondary' : 'btn-outline-primary', 'btn-sm', 'me-4'],
-  }, t('button.show'));
+    classes: ['btn', 'btn-outline-primary', 'btn-sm', 'me-4'],
+  }, buttonText);
   liEl.append(buttonEl, titleEl);
 
   return liEl;
@@ -41,23 +43,15 @@ export default class Feeds {
     const t = this.i18n.t.bind(this.i18n);
     this.elements.header.textContent = t('reader.posts');
     this.elements.container.append(this.elements.header, this.elements.list);
-
-    const items = [
-      { title: 'http://lorem-rss.herokuapp.com/feed', link: 'http://lorem-rss.herokuapp.com/feed', visited: false },
-      { title: 'https://ru.hexlet.io/lessons.rss', link: 'https://ru.hexlet.io/lessons.rss', visited: true },
-      { title: 'https://cv.hexlet.io/vacancies.rss', link: 'https://cv.hexlet.io/vacancies.rss', visited: false },
-    ];
-    items.forEach((item) => this.elements.list.append(createItem(item, t)));
   }
 
-  render() {
-    const t = this.i18n.t.bind(this.i18n);
-    const posts = this.rssFeeder.sources.get('posts');
-    this.elements.list.innerHTML = '';
+  render(posts) {
+    const buttonText = this.i18n.t('button.show');
+
     posts.forEach((post) => {
       const title = post.get('title');
       const link = post.get('link');
-      const itemEl = createItem({ title, link }, t);
+      const itemEl = createItem({ title, link }, buttonText);
       this.elements.list.prepend(itemEl);
     });
   }

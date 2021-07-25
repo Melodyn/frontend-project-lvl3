@@ -37,14 +37,9 @@ export default class Feeds {
   init() {
     this.elements.header.textContent = this.i18n.t('reader.feeds');
     this.elements.container.append(this.elements.header, this.elements.list);
-
-    const items = [{ title: 'Hello', description: 'Kitty & Doge' }, { title: 'Goodbye', description: 'World' }];
-    items.forEach((item) => this.elements.list.append(createItem(item)));
   }
 
-  render() {
-    const feeds = this.rssFeeder.sources.get('feeds');
-    this.elements.list.innerHTML = '';
+  render(feeds) {
     feeds.forEach((feed) => {
       const title = feed.get('title');
       const description = feed.get('description');

@@ -29,5 +29,7 @@ export default class App {
       this.elements.header.container,
       this.elements.reader.container,
     );
+
+    view.app.state = 'started';
   }
 }

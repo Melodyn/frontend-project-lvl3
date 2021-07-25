@@ -13,14 +13,20 @@ const run = async () => {
 
   const state = {
     app: {
+      state: 'init',
       isProd: (config.NODE_ENV === 'production'),
       lng: 'ru',
     },
-    feedsUpdateTimestamp: null,
+    newFeeds: [],
+    newPosts: [],
     uiState: {
       form: {
         state: 'ready',
         errorType: null,
+      },
+      reader: {
+        isHidden: true,
+        visitedPostIds: [],
       },
     },
   };
@@ -37,11 +43,6 @@ const run = async () => {
       });
       const view = initView(state, app);
       app.init(view);
-      app.header.form.renderEmpty();
-
-      rssFeeder.addUpdateListener(() => {
-        view.feedsUpdateTimestamp = Date.now();
-      });
       rssFeeder.enableAutoSync();
     });
 };
