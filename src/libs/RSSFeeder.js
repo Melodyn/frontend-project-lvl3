@@ -51,20 +51,15 @@ export default class RSSFeeder {
     ]);
     this.syncPeriod = params.RSS_SYNC_PERIOD;
     this.listeners = [];
-    this.state = {
-      autoSync: 'stop',
-      loadedFeedsMap: new Map(),
-      fakeMode: false,
-    };
+    this.autoSyncState = 'stop';
   }
 
-  addByUrl(link, fakeMode = false) {
-    this.state.fakeMode = fakeMode;
+  addByUrl(link) {
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
 
     return validate(link, feeds)
-      .then(() => this.httpClient.get(link, fakeMode))
+      .then(() => this.httpClient.get(link))
       .then((rawData) => this.parse(rawData, link))
       .then((parsedData) => {
         const feed = parsedData.get('channel');
@@ -79,10 +74,10 @@ export default class RSSFeeder {
   }
 
   enableAutoSync() {
-    this.state.autoSync = 'run';
+    this.autoSyncState = 'run';
 
     const sync = () => {
-      setTimeout(() => ((this.state.autoSync === 'run')
+      setTimeout(() => ((this.autoSyncState === 'run')
         ? this.updatePosts()
           .then((hasUpdates) => (hasUpdates ? this.notify() : false))
           .then(() => sync())
@@ -120,8 +115,7 @@ export default class RSSFeeder {
       return acc;
     }, new Map());
 
-    const newPostPromises = feeds.map((feed) => this.httpClient
-      .get(feed, this.state.fakeMode)
+    const newPostPromises = feeds.map((feed) => this.httpClient.get(feed)
       .then((rawData) => this.parse(rawData, feed))
       .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
       .then((allPosts) => {
