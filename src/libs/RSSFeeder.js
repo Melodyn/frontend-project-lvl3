@@ -1,7 +1,7 @@
 import createHTTPClient from './createHTTPClient.js';
 import AppError from '../AppError.js';
 
-const rssToObj = (rootElement) => {
+const rssToObj = (rootElement, feed) => {
   const iter = (element, accum) => {
     const key = element.tagName;
     const value = (element.children.length === 0)
@@ -10,6 +10,7 @@ const rssToObj = (rootElement) => {
 
     if (key === 'item') {
       const items = accum.has('items') ? accum.get('items') : [];
+      value.set('feed', feed);
       items.unshift(value);
       accum.set('items', items);
     } else {
@@ -44,7 +45,10 @@ export default class RSSFeeder {
   constructor(params = {}) {
     this.httpClient = createHTTPClient(params);
     this.parser = new DOMParser();
-    this.feeds = new Map();
+    this.sources = new Map([
+      ['feeds', new Map()],
+      ['posts', []],
+    ]);
     this.syncPeriod = params.RSS_SYNC_PERIOD;
     this.listeners = [];
     this.state = {
@@ -56,16 +60,20 @@ export default class RSSFeeder {
 
   addByUrl(link, fakeMode = false) {
     this.state.fakeMode = fakeMode;
-    return validate(link, this.feeds)
+    const feeds = this.sources.get('feeds');
+    const posts = this.sources.get('posts');
+
+    return validate(link, feeds)
       .then(() => this.httpClient.get(link, fakeMode))
-      .then((rawData) => this.parse(rawData))
+      .then((rawData) => this.parse(rawData, link))
       .then((parsedData) => {
-        const items = Array.from(parsedData.get('channel').get('items'));
-        const guids = items.map((item) => item.get('guid'));
-        this.state.loadedFeedsMap.set(link, guids);
-        return parsedData;
+        const feed = parsedData.get('channel');
+        const feedPosts = Array.from(feed.get('items'));
+        posts.push(...feedPosts);
+        feed.delete('items');
+        feed.set('feed', link);
+        feeds.set(link, feed);
       })
-      .then((parsedData) => this.feeds.set(link, parsedData))
       .then(() => this.notify())
       .then(() => true);
   }
@@ -87,7 +95,7 @@ export default class RSSFeeder {
 
   // "private"
 
-  parse(data) {
+  parse(data, feed) {
     const document = this.parser.parseFromString(data, 'text/xml');
     const { documentElement: { tagName } } = document;
     if (tagName !== 'rss') {
@@ -95,31 +103,38 @@ export default class RSSFeeder {
     }
     const channelEl = document.querySelector('channel');
 
-    return rssToObj(channelEl);
+    return rssToObj(channelEl, feed);
   }
 
   updatePosts() {
-    const newPostPromises = Array.from(this.state.loadedFeedsMap)
-      .map(([feedLink, loadedPostGuids]) => this.httpClient
-        .get(feedLink, this.state.fakeMode)
-        .then((rawData) => this.parse(rawData))
-        .then((parsedData) => {
-          const items = Array.from(parsedData.get('channel').get('items'));
-          return items.filter((item) => !loadedPostGuids.includes(item.get('guid')));
-        })
-        .then((newPosts) => {
-          if (newPosts.length > 0) {
-            const newPostGuids = Array.from(newPosts).map((item) => item.get('guid'));
-            const feed = this.feeds.get(feedLink);
-            const feedItems = feed.get('channel').get('items');
-            feedItems.push(...newPosts);
-            loadedPostGuids.push(...newPostGuids);
+    const feeds = Array.from(this.sources.get('feeds').keys());
+    const posts = this.sources.get('posts');
+    const postGuidsByFeeds = Array.from(posts).reduce((acc, post) => {
+      const feed = post.get('feed');
+      const guid = post.get('guid');
+      if (acc.has(feed)) {
+        acc.get(feed).push(guid);
+      } else {
+        acc.set(feed, [guid]);
+      }
+      return acc;
+    }, new Map());
 
-            return true;
-          }
-
-          return false;
-        }));
+    const newPostPromises = feeds.map((feed) => this.httpClient
+      .get(feed, this.state.fakeMode)
+      .then((rawData) => this.parse(rawData, feed))
+      .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
+      .then((allPosts) => {
+        const postGuidsInFeed = postGuidsByFeeds.get(feed);
+        return allPosts.filter((post) => !postGuidsInFeed.includes(post.get('guid')));
+      })
+      .then((newPosts) => {
+        if (newPosts.length > 0) {
+          posts.push(...newPosts);
+          return true;
+        }
+        return false;
+      }));
 
     return Promise.all(newPostPromises)
       .then((updates) => updates.some((wasUpdated) => wasUpdated));

@@ -52,16 +52,13 @@ export default class Feeds {
 
   render() {
     const t = this.i18n.t.bind(this.i18n);
+    const posts = this.rssFeeder.sources.get('posts');
     this.elements.list.innerHTML = '';
-    this.rssFeeder.feeds.forEach((feed) => {
-      const items = feed.get('channel').get('items');
-
-      items.forEach((item) => {
-        const title = item.get('title');
-        const link = item.get('link');
-        const itemEl = createItem({ title, link }, t);
-        this.elements.list.prepend(itemEl);
-      });
+    posts.forEach((post) => {
+      const title = post.get('title');
+      const link = post.get('link');
+      const itemEl = createItem({ title, link }, t);
+      this.elements.list.prepend(itemEl);
     });
   }
 }

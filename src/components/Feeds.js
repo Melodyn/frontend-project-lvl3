@@ -43,11 +43,11 @@ export default class Feeds {
   }
 
   render() {
+    const feeds = this.rssFeeder.sources.get('feeds');
     this.elements.list.innerHTML = '';
-    this.rssFeeder.feeds.forEach((feed) => {
-      const channel = feed.get('channel');
-      const title = channel.get('title');
-      const description = channel.get('description');
+    feeds.forEach((feed) => {
+      const title = feed.get('title');
+      const description = feed.get('description');
       const item = createItem({ title, description });
       this.elements.list.prepend(item);
     });
