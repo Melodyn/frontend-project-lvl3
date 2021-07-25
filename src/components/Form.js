@@ -65,7 +65,6 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       this.rssFeeder.addByUrl(url)
-      // this.rssFeeder.addByUrl(url, 'fakeMode')
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
