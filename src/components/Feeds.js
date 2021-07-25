@@ -17,7 +17,7 @@ const createItem = ({ title, description }) => {
 
 const elements = {
   container: createElement('div', {
-    classes: ['col-sm-4', 'text-end'],
+    classes: ['col-md-4', 'text-end'],
   }),
   header: createElement('h2', {
     classes: ['h3'],

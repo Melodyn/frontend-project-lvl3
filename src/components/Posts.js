@@ -4,7 +4,7 @@ const createItem = (item, buttonText) => {
   const { title, link } = item;
 
   const liEl = createElement('li', {
-    classes: ['list-group-item', 'text-break', 'ps-0', 'py-3'],
+    classes: ['list-group-item', 'd-flex', 'ps-0', 'py-3'],
   });
   const titleEl = createElement('a', {
     href: link || '#',
@@ -13,7 +13,7 @@ const createItem = (item, buttonText) => {
   }, title);
   const buttonEl = createElement('button', {
     type: 'button',
-    classes: ['btn', 'btn-outline-primary', 'btn-sm', 'me-4'],
+    classes: ['btn', 'btn-outline-primary', 'btn-sm', 'me-4', 'mb-auto'],
   }, buttonText);
   liEl.append(buttonEl, titleEl);
 
@@ -22,7 +22,7 @@ const createItem = (item, buttonText) => {
 
 const elements = {
   container: createElement('div', {
-    classes: ['col-sm-8', 'order-sm-first'],
+    classes: ['col-md-8', 'order-md-first'],
   }),
   header: createElement('h2', {
     classes: ['h3'],
