@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import resources from './locales/index.js';
-import initView from './view.js';
+import initView from './initView.js';
 import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
@@ -26,7 +26,7 @@ const run = async () => {
       },
       reader: {
         isHidden: true,
-        visitedPostIds: [],
+        visitedPost: {},
       },
     },
   };

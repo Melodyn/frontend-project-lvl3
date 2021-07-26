@@ -1,6 +1,6 @@
 import onChange from 'on-change';
 
-const view = (initState, app) => {
+const initView = (initState, app) => {
   const { header: { form }, reader } = app;
 
   const formHandler = () => {
@@ -18,13 +18,15 @@ const view = (initState, app) => {
     }
   };
 
-  return onChange(initState, (path, value) => {
+  const view = onChange(initState, (path, value) => {
     switch (path) {
       case 'app.state':
       case 'uiState.form.state':
         return formHandler();
       case 'newPosts':
-        return reader.posts.render(value);
+        return reader.posts.renderPosts(value, view);
+      case 'uiState.reader.visitedPost':
+        return reader.posts.renderVisitedPost(value, view);
       case 'newFeeds':
         return reader.feeds.render(value);
       case 'uiState.reader.isHidden':
@@ -33,6 +35,8 @@ const view = (initState, app) => {
         return false;
     }
   });
+
+  return view;
 };
 
-export default view;
+export default initView;
