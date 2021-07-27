@@ -66,10 +66,12 @@ export default class Form {
 
       view.uiState.form.state = 'processing';
 
+      console.log('--->', 'addByUrl', { url });
       this.rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
+          console.log('--->', 'success');
         })
         .catch((err) => {
           if (err instanceof AppError) {
@@ -79,6 +81,7 @@ export default class Form {
             view.uiState.form.errorType = 'loading';
           }
           view.uiState.form.state = 'error';
+          console.log('--->', 'error', err.message);
         });
     });
   }

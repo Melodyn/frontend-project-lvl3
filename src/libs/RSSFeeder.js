@@ -70,6 +70,7 @@ export default class RSSFeeder {
   }
 
   addByUrl(link) {
+    console.log();
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
 
