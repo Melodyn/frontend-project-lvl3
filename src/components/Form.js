@@ -10,17 +10,18 @@ const elements = {
     classes: ['input-group', 'input-group-lg', 'py-2'],
   }),
   input: createElement('input', {
-    id: 'url',
+    id: 'url-input',
     name: 'url',
     type: 'text',
     required: true,
     autofocus: true,
-    'aria-describedby': 'url-add',
+    'aria-label': 'url',
     classes: ['form-control'],
   }),
   button: createElement('button', {
     id: 'url-add',
     type: 'submit',
+    'aria-label': 'add',
     classes: ['btn', 'btn-primary'],
   }),
 
