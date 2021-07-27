@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 import initView from './initView.js';
