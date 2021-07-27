@@ -61,13 +61,15 @@ export default class Form {
 
     this.elements.form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('--->', 'submit', e.target);
+      console.log('--->', 'submit');
+      console.dir(e.target.url);
       const form = new FormData(e.target);
+      console.log('--->', 'form', Array.from(form.keys()), Array.from(form.values()));
       const url = form.get('url');
 
       view.uiState.form.state = 'processing';
 
-      // console.log('--->', 'addByUrl', { url: e.target.url.value });
+      console.log('--->', 'addByUrl', { url });
       await this.rssFeeder.addByUrl(url)
         .then(() => {
           console.log('--->', `success ${url}`);
