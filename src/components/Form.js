@@ -59,7 +59,7 @@ export default class Form {
       this.elements.formStatus,
     );
 
-    this.elements.form.addEventListener('submit', (e) => {
+    this.elements.form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = new FormData(e.target);
       const url = form.get('url');
@@ -67,7 +67,7 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       console.log('--->', 'addByUrl', { url });
-      this.rssFeeder.addByUrl(url)
+      await this.rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
