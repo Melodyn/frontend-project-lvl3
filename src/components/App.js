@@ -1,11 +1,17 @@
 import Header from './Header.js';
 import Reader from './Reader.js';
 
-const elements = {
+// const elements = {
+//   html: document.querySelector('html'),
+//   title: document.querySelector('title'),
+//   body: document.querySelector('body'),
+// };
+
+const getElements = () => ({
   html: document.querySelector('html'),
   title: document.querySelector('title'),
   body: document.querySelector('body'),
-};
+});
 
 export default class App {
   constructor(services) {
@@ -13,7 +19,7 @@ export default class App {
     this.header = new Header(services);
     this.reader = new Reader(services);
     this.elements = {
-      ...elements,
+      ...getElements(),
       header: this.header.elements,
       reader: this.reader.elements,
       modal: this.reader.posts.modal.elements,
@@ -24,6 +30,7 @@ export default class App {
     this.header.init(view);
     this.reader.init(view);
 
+    console.dir(document.querySelector('title'));
     this.elements.title.textContent = this.i18n.t('appName');
     this.elements.html.setAttribute('lang', view.app.lng);
     this.elements.body.append(
