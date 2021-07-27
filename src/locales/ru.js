@@ -4,6 +4,8 @@ export default {
     button: {
       urlAdd: 'Добавить',
       show: 'Просмотр',
+      read: 'Читать полностью',
+      close: 'Закрыть',
     },
     form: {
       status: {

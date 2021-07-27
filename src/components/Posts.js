@@ -1,4 +1,5 @@
 import createElement from '../libs/createElement.js';
+import Modal from './Modal.js';
 
 const createItem = (post, buttonText, view) => {
   const description = post.get('description');
@@ -18,6 +19,8 @@ const createItem = (post, buttonText, view) => {
   }, title);
   const buttonEl = createElement('button', {
     type: 'button',
+    'data-bs-toggle': 'modal',
+    'data-bs-target': '#modal',
     classes: ['btn', 'btn-outline-primary', 'btn-sm', 'me-4', 'mb-auto'],
   }, buttonText);
   liEl.append(buttonEl, titleEl);
@@ -48,12 +51,16 @@ export default class Posts {
   constructor(services) {
     this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
-    this.elements = elements;
+    this.modal = new Modal(services);
+    this.elements = {
+      ...elements,
+      modal: this.modal.elements,
+    };
   }
 
   init() {
-    const t = this.i18n.t.bind(this.i18n);
-    this.elements.header.textContent = t('reader.posts');
+    this.modal.init();
+    this.elements.header.textContent = this.i18n.t('reader.posts');
     this.elements.container.append(this.elements.header, this.elements.list);
   }
 
@@ -82,8 +89,8 @@ export default class Posts {
       const title = titleEl.textContent;
       const { description } = postEl.dataset;
       const link = titleEl.href;
-      // eslint-disable-next-line no-alert
-      alert(`${title}\n\n${description}\n----\n${link}`);
+
+      this.modal.render(title, description, link);
     }
   }
 }

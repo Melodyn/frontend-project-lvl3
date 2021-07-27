@@ -16,6 +16,7 @@ export default class App {
       ...elements,
       header: this.header.elements,
       reader: this.reader.elements,
+      modal: this.reader.posts.modal.elements,
     };
   }
 
@@ -26,6 +27,7 @@ export default class App {
     this.elements.title.textContent = this.i18n.t('appName');
     this.elements.html.setAttribute('lang', view.app.lng);
     this.elements.body.append(
+      this.elements.modal.container,
       this.elements.header.container,
       this.elements.reader.container,
     );
