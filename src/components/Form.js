@@ -66,7 +66,7 @@ export default class Form {
 
       view.uiState.form.state = 'processing';
 
-      console.log('--->', 'addByUrl', { url });
+      console.log('--->', 'addByUrl', { url: e.target.url.value });
       await this.rssFeeder.addByUrl(url)
         .then(() => {
           console.log('--->', `success ${url}`);
