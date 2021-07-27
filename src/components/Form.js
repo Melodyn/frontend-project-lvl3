@@ -61,11 +61,13 @@ export default class Form {
 
     this.elements.form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('--->', 'submit');
-      console.dir(e.target.url);
       const form = new FormData(e.target);
       console.log('--->', 'form', Array.from(form.keys()), Array.from(form.values()));
       const url = form.get('url');
+      if (!url) {
+        console.log(e.target.url.outerHTML);
+        return;
+      }
 
       view.uiState.form.state = 'processing';
 
