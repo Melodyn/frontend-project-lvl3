@@ -36,6 +36,7 @@ const rssToObj = (rootElement, feed) => {
 };
 
 const validate = async (link, feeds) => {
+  console.log('--->', 'validate', { link, feeds });
   let url;
 
   try {
@@ -70,7 +71,6 @@ export default class RSSFeeder {
   }
 
   addByUrl(link) {
-    console.log();
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
 

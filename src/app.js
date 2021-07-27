@@ -36,7 +36,12 @@ const run = async () => {
   const rssFeeder = new RSSFeeder(config);
 
   return i18n
-    .init({ lng: state.app.lng, debug: !state.app.isProd, resources })
+    .init({
+      lng: state.app.lng,
+      // debug: !state.app.isProd,
+      debug: false,
+      resources,
+    })
     .then(() => {
       const app = new App({
         i18n,
