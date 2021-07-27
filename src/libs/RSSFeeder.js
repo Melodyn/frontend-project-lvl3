@@ -36,7 +36,6 @@ const rssToObj = (rootElement, feed) => {
 };
 
 const validate = async (link, feeds) => {
-  console.log('--->', 'validate', { link, feeds });
   let url;
 
   try {
