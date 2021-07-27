@@ -62,10 +62,9 @@ export default class Form {
     this.elements.form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = new FormData(e.target);
-      console.log('--->', 'form', Array.from(form.keys()), Array.from(form.values()));
       const url = form.get('url');
       if (!url) {
-        console.log(e.target.url.outerHTML);
+        // console.log('--->', 'form', Array.from(form.keys()), Array.from(form.values()));
         return;
       }
 
