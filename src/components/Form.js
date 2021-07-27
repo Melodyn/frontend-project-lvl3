@@ -12,8 +12,9 @@ const elements = {
   input: createElement('input', {
     id: 'url',
     name: 'url',
-    type: 'url',
+    type: 'text',
     required: true,
+    autofocus: true,
     'aria-describedby': 'url-add',
     classes: ['form-control'],
   }),
