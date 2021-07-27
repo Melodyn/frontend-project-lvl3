@@ -5,6 +5,7 @@ export default {
   plugins: [
     new Hwp({
       favicon: './src/icon.ico',
+      template: 'index.html',
     }),
   ],
   output: {
