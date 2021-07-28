@@ -68,6 +68,7 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       try {
+        console.log('validate', { url }, this.rssFeeder.sources.get('feeds'));
         this.rssFeeder.validateSync(url);
       } catch (err) {
         if (err instanceof AppError) {
@@ -80,7 +81,7 @@ export default class Form {
         return;
       }
 
-      console.log({ url });
+      console.log('add', { url });
 
       this.rssFeeder.addByUrl(url)
         .then(() => {
