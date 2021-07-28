@@ -61,6 +61,7 @@ export default class Form {
 
     const { rssFeeder } = this;
     this.elements.form.addEventListener('submit', (e) => {
+      console.log(`triggered form submit in state ${view.uiState.form.state}`, e.target);
       e.preventDefault();
       const form = new FormData(e.target);
       const url = form.get('url');
