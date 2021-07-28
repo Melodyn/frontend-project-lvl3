@@ -80,6 +80,8 @@ export default class Form {
         return;
       }
 
+      console.log({ url });
+
       this.rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;

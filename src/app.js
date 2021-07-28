@@ -6,6 +6,7 @@ import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
 const run = async () => {
+  console.log('\n', `${'-'.repeat(5)} App Started ${'-'.repeat(5)}`, '\n');
   const config = {
     NODE_ENV: process.env.NODE_ENV,
     RSS_SYNC_PERIOD: 5000,
