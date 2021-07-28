@@ -5,7 +5,7 @@ import initView from './initView.js';
 import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
-const run = async () => {
+const run = () => {
   console.log('\n', `${'-'.repeat(15)} App Started ${'-'.repeat(15)}`, '\n');
   const config = {
     NODE_ENV: process.env.NODE_ENV,
