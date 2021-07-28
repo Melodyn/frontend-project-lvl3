@@ -70,8 +70,20 @@ export default class Form {
 
       view.uiState.form.state = 'processing';
 
-      this.rssFeeder.validateSync(url);
-      console.log('--->', 'add', { url });
+      try {
+        this.rssFeeder.validateSync(url);
+        console.log('--->', 'add', { url });
+      } catch (err) {
+        if (err instanceof AppError) {
+          view.uiState.form.errorType = err.errorType;
+        } else {
+          console.error(err);
+          view.uiState.form.errorType = 'loading';
+        }
+        console.log('--->', `error ${url}`, err.message);
+        view.uiState.form.state = 'error';
+        return;
+      }
 
       this.rssFeeder.addByUrl(url)
         .then(() => {
