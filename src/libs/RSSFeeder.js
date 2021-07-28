@@ -69,6 +69,22 @@ export default class RSSFeeder {
     ]);
   }
 
+  validateSync(link) {
+    const feeds = this.sources.get('feeds');
+    let url;
+
+    try {
+      url = new URL(link);
+    } catch (err) {
+      throw new AppError(err, 'validation.url');
+    }
+
+    const feedsLinks = feeds.map((feed) => feed.get('feed'));
+    if (feedsLinks.includes(url.toString())) {
+      throw new AppError('Url not unique', 'validation.unique');
+    }
+  }
+
   addByUrl(link) {
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
