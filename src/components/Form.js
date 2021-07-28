@@ -69,7 +69,7 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       try {
-        console.log('validate', { url }, 'feeds: ', rssFeeder.sources.get('feeds'));
+        console.log('validate', { url }, 'feeds: ', rssFeeder.sources.feeds);
         rssFeeder.validateSync(url);
       } catch (err) {
         if (err instanceof AppError) {
