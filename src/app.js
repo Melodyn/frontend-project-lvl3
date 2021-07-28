@@ -35,6 +35,7 @@ const run = async () => {
 
   const i18n = i18next.createInstance();
   const rssFeeder = new RSSFeeder(config);
+  console.log('Init rssFeeder.sources', rssFeeder.sources);
 
   return i18n
     .init({
@@ -50,7 +51,7 @@ const run = async () => {
       });
       const view = initView(state, app);
       app.init(view);
-      rssFeeder.enableAutoSync();
+      // rssFeeder.enableAutoSync();
     });
 };
 

@@ -41,6 +41,7 @@ export default class Form {
   constructor(services) {
     this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
+    console.log('Form rssFeeder.sources', this.rssFeeder.sources);
     this.elements = elements;
   }
 
@@ -61,18 +62,20 @@ export default class Form {
 
     const { rssFeeder } = this;
     this.elements.form.addEventListener('submit', (e) => {
-      console.log(`triggered form submit in state ${view.uiState.form.state}`, e.target);
       e.preventDefault();
       const form = new FormData(e.target);
       const url = form.get('url');
       if (!url) return;
 
+      console.log(`triggered form submit in state ${view.uiState.form.state}`);
+      console.log('EventListener rssFeeder.sources', this.rssFeeder.sources);
       view.uiState.form.state = 'processing';
 
       try {
-        console.log('validate', { url }, 'feeds: ', rssFeeder.sources.feeds);
+        console.log('validate', { url });
         rssFeeder.validateSync(url);
       } catch (err) {
+        console.log('not valid', { url });
         if (err instanceof AppError) {
           view.uiState.form.errorType = err.errorType;
         } else {
