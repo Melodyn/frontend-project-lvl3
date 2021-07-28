@@ -106,7 +106,7 @@ export default class Form {
 
   renderEmpty(stateName = 'ready') {
     this.elements.button.disabled = false;
-    this.elements.input.disabled = false;
+    this.elements.input.removeAttribute('readonly');
     this.elements.input.classList.remove('is-invalid');
     this.elements.form.reset();
     this.elements.input.focus();
@@ -117,7 +117,7 @@ export default class Form {
 
   renderProcess() {
     this.elements.button.disabled = true;
-    this.elements.input.disabled = true;
+    this.elements.input.setAttribute('readonly', true);
     this.elements.input.classList.remove('is-invalid');
     this.elements.formStatus.textContent = this.i18n.t('form.status.processing');
     this.elements.formStatus.classList.remove(...formStatusColors);
@@ -126,7 +126,7 @@ export default class Form {
 
   renderError(stepName) {
     this.elements.button.disabled = false;
-    this.elements.input.disabled = false;
+    this.elements.input.removeAttribute('readonly');
     this.elements.formStatus.textContent = this.i18n.t(`form.error.${stepName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
     this.elements.formStatus.classList.add('text-danger');
