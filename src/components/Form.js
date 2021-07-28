@@ -68,14 +68,14 @@ export default class Form {
       if (!url) return;
 
       console.log(`triggered form submit in state ${view.uiState.form.state}`);
-      console.log('EventListener rssFeeder.sources', this.rssFeeder.sources);
+      // console.log('EventListener rssFeeder.sources', this.rssFeeder.sources);
       view.uiState.form.state = 'processing';
 
       try {
         console.log('validate', { url });
         rssFeeder.validateSync(url);
       } catch (err) {
-        console.log('not valid', { url });
+        console.log('not valid', { url }, err.message);
         if (err instanceof AppError) {
           view.uiState.form.errorType = err.errorType;
         } else {

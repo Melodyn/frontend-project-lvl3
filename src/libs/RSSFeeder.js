@@ -115,7 +115,6 @@ export default class RSSFeeder {
   addByUrl(link) {
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
-    console.log('addByUrl', { link }, 'feeds: ', feeds);
 
     return this.httpClient.get(link)
       .then((rawData) => {
