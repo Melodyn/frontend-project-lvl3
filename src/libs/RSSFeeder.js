@@ -61,20 +61,20 @@ const rssToJSON = (rootElement, feed) => {
   }
 };
 
-const validate = async (link, feeds) => {
-  let url;
-
-  try {
-    url = new URL(link);
-  } catch (err) {
-    throw new AppError(err, 'validation.url');
-  }
-
-  const feedsLinks = feeds.map((feed) => feed.get('feed'));
-  if (feedsLinks.includes(url.toString())) {
-    throw new AppError('Url not unique', 'validation.unique');
-  }
-};
+// const validate = async (link, feeds) => {
+//   let url;
+//
+//   try {
+//     url = new URL(link);
+//   } catch (err) {
+//     throw new AppError(err, 'validation.url');
+//   }
+//
+//   const feedsLinks = feeds.map((feed) => feed.get('feed'));
+//   if (feedsLinks.includes(url.toString())) {
+//     throw new AppError('Url not unique', 'validation.unique');
+//   }
+// };
 
 export default class RSSFeeder {
   constructor(params = {}) {

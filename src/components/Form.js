@@ -68,7 +68,6 @@ export default class Form {
       if (!url) return;
 
       console.log(`triggered form submit in state ${view.uiState.form.state}`);
-      // console.log('EventListener rssFeeder.sources', this.rssFeeder.sources);
       view.uiState.form.state = 'processing';
 
       try {
@@ -94,6 +93,7 @@ export default class Form {
           view.uiState.form.state = 'success';
         })
         .catch((err) => {
+          console.log('addByUrl error', { url }, err.message);
           if (err instanceof AppError) {
             view.uiState.form.errorType = err.errorType;
           } else {
