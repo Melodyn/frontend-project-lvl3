@@ -85,28 +85,19 @@ export default class RSSFeeder {
     this.httpClient = createHTTPClient(params);
 
     this.parser = new DOMParser();
-    // this.sources = new Map([
-    //   ['feeds', []],
-    //   ['posts', []],
-    // ]);
-    this.sources = {
-      feeds: [],
-      posts: [],
-    };
-    // this.listeners = new Map([
-    //   ['add.feed', []],
-    //   ['add.posts', []],
-    // ]);
-    this.listeners = {
-      'add.feed': [],
-      'add.posts': [],
-    };
+    this.sources = new Map([
+      ['feeds', []],
+      ['posts', []],
+    ]);
+    this.listeners = new Map([
+      ['add.feed', []],
+      ['add.posts', []],
+    ]);
     console.log('Created RSSFeeder', this.sources);
   }
 
   validateSync(link) {
-    // const feeds = this.sources.get('feeds');
-    const { feeds } = this.sources;
+    const feeds = this.sources.get('feeds');
     let url;
 
     try {
@@ -122,13 +113,11 @@ export default class RSSFeeder {
   }
 
   addByUrl(link) {
-    // const feeds = this.sources.get('feeds');
-    // const posts = this.sources.get('posts');
-    const { feeds, posts } = this.sources;
+    const feeds = this.sources.get('feeds');
+    const posts = this.sources.get('posts');
     console.log('addByUrl', { link }, 'feeds: ', feeds);
 
-    return validate(link, feeds)
-      .then(() => this.httpClient.get(link))
+    return this.httpClient.get(link)
       .then((rawData) => {
         const parsedData = this.parse(rawData, link, true);
         console.log('---> rawData', rawData);
@@ -202,9 +191,8 @@ export default class RSSFeeder {
   }
 
   updatePosts() {
-    // const feeds = this.sources.get('feeds');
-    // const posts = this.sources.get('posts');
-    const { feeds, posts } = this.sources;
+    const feeds = this.sources.get('feeds');
+    const posts = this.sources.get('posts');
     const postGuidsByFeeds = posts.reduce((acc, post) => {
       const feed = post.get('feed');
       const guid = post.get('guid');
@@ -248,14 +236,12 @@ export default class RSSFeeder {
   // -- observer
 
   addEventListener(event, listener) {
-    // const listeners = this.listeners.get(event);
-    const listeners = this.listeners[event];
+    const listeners = this.listeners.get(event);
     listeners.push(listener);
   }
 
   notify(event, data) {
-    // const listeners = this.listeners.get(event);
-    const listeners = this.listeners[event];
+    const listeners = this.listeners.get(event);
     listeners.forEach((listener) => listener(data));
   }
 }
