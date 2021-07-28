@@ -63,16 +63,12 @@ export default class Form {
       e.preventDefault();
       const form = new FormData(e.target);
       const url = form.get('url');
-      if (!url) {
-        console.log('--->', 'form', Array.from(form.keys()), Array.from(form.values()));
-        return;
-      }
+      if (!url) return;
 
       view.uiState.form.state = 'processing';
 
       try {
         this.rssFeeder.validateSync(url);
-        console.log('--->', 'add', { url });
       } catch (err) {
         if (err instanceof AppError) {
           view.uiState.form.errorType = err.errorType;
@@ -80,14 +76,12 @@ export default class Form {
           console.error(err);
           view.uiState.form.errorType = 'loading';
         }
-        console.log('--->', `error ${url}`, err.message);
         view.uiState.form.state = 'error';
         return;
       }
 
       this.rssFeeder.addByUrl(url)
         .then(() => {
-          console.log('--->', `success ${url}`);
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
         })
@@ -98,7 +92,6 @@ export default class Form {
             console.error(err);
             view.uiState.form.errorType = 'loading';
           }
-          console.log('--->', `error ${url}`, err.message);
           view.uiState.form.state = 'error';
         });
     });

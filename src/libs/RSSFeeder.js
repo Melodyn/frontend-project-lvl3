@@ -35,6 +35,32 @@ const rssToObj = (rootElement, feed) => {
   }
 };
 
+const rssToJSON = (rootElement, feed) => {
+  const iter = (element, accum) => {
+    const key = element.tagName;
+    const value = (element.children.length === 0)
+      ? element.textContent
+      : Array.from(element.children).reduce((acc, item) => iter(item, acc), {});
+
+    if (key === 'item') {
+      const items = accum.items || [];
+      value.feed = feed;
+      items.push(value);
+      accum.items = items;
+    } else {
+      accum[key] = value;
+    }
+
+    return accum;
+  };
+
+  try {
+    return iter(rootElement, {});
+  } catch (err) {
+    throw new AppError(err, 'parsing');
+  }
+};
+
 const validate = async (link, feeds) => {
   let url;
 
@@ -91,7 +117,12 @@ export default class RSSFeeder {
 
     return validate(link, feeds)
       .then(() => this.httpClient.get(link))
-      .then((rawData) => this.parse(rawData, link))
+      .then((rawData) => {
+        const parsedData = this.parse(rawData, link, true);
+        console.log('---> rawData', rawData);
+        console.log('---> parsedData', JSON.stringify(parsedData, null, 1));
+        return this.parse(rawData, link);
+      })
       .then((parsedData) => {
         const feed = parsedData.get('channel');
         const feedPosts = Array.from(feed.get('items'));
@@ -141,7 +172,7 @@ export default class RSSFeeder {
 
   // "private"
 
-  parse(data, feed) {
+  parse(data, feed, isJSON = false) {
     const document = this.parser.parseFromString(data, 'text/xml');
     const { documentElement: { tagName } } = document;
     if (tagName !== 'rss') {
@@ -149,7 +180,8 @@ export default class RSSFeeder {
     }
     const channelEl = document.querySelector('channel');
 
-    const parsedFeed = rssToObj(channelEl, feed);
+    const parsedFeed = isJSON ? rssToJSON(channelEl, feed) : rssToObj(channelEl, feed);
+    if (isJSON) return parsedFeed;
     const channel = parsedFeed.get('channel');
     if (!channel.has('items')) {
       channel.set('items', []);
