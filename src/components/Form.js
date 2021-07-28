@@ -59,6 +59,7 @@ export default class Form {
       this.elements.formStatus,
     );
 
+    const { rssFeeder } = this;
     this.elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const form = new FormData(e.target);
@@ -68,8 +69,8 @@ export default class Form {
       view.uiState.form.state = 'processing';
 
       try {
-        console.log('validate', { url }, this.rssFeeder.sources.get('feeds'));
-        this.rssFeeder.validateSync(url);
+        console.log('validate', { url }, 'feeds: ', rssFeeder.sources.get('feeds'));
+        rssFeeder.validateSync(url);
       } catch (err) {
         if (err instanceof AppError) {
           view.uiState.form.errorType = err.errorType;
@@ -83,7 +84,7 @@ export default class Form {
 
       console.log('add', { url });
 
-      this.rssFeeder.addByUrl(url)
+      rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';

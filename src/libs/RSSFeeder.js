@@ -93,7 +93,7 @@ export default class RSSFeeder {
       ['add.feed', []],
       ['add.posts', []],
     ]);
-    console.log('Created RSSFeeder', this.sources, this.listeners);
+    console.log('Created RSSFeeder', this.sources);
   }
 
   validateSync(link) {
@@ -114,6 +114,7 @@ export default class RSSFeeder {
 
   addByUrl(link) {
     const feeds = this.sources.get('feeds');
+    console.log('addByUrl', { link }, 'feeds: ', feeds);
     const posts = this.sources.get('posts');
 
     return validate(link, feeds)
