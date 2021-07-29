@@ -38,8 +38,7 @@ const run = () => {
   return i18n
     .init({
       lng: state.app.lng,
-      // debug: !state.app.isProd,
-      debug: false,
+      debug: !state.app.isProd,
       resources,
     })
     .then(() => {

@@ -14,6 +14,7 @@ const getElements = () => ({
     name: 'url',
     type: 'text',
     required: true,
+    autocomplete: 'off',
     'aria-label': 'url',
     classes: ['form-control'],
   }),

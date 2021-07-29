@@ -9,7 +9,7 @@ const idGen = () => {
   };
 };
 
-const rssToObj = (rootElement, feed) => {
+const rssToObj = (rootElement) => {
   const iter = (element, accum) => {
     const key = element.tagName;
     const value = (element.children.length === 0)
@@ -18,7 +18,6 @@ const rssToObj = (rootElement, feed) => {
 
     if (key === 'item') {
       const items = accum.has('items') ? accum.get('items') : [];
-      value.set('feed', feed);
       items.push(value);
       accum.set('items', items);
     } else {
@@ -64,30 +63,13 @@ export default class RSSFeeder {
       ['posts', []],
     ]);
     this.listeners = new Map([
-      ['add.feed', []],
+      ['add.feeds', []],
       ['add.posts', []],
     ]);
   }
 
-  validateSync(link) {
-    const feeds = this.sources.get('feeds');
-    let url;
-
-    try {
-      url = new URL(link);
-    } catch (err) {
-      throw new AppError(err, 'validation.url');
-    }
-
-    const feedsLinks = feeds.map((feed) => feed.get('feed'));
-    if (feedsLinks.includes(url.toString())) {
-      throw new AppError('Url not unique', 'validation.unique');
-    }
-  }
-
   addByUrl(link) {
     const feeds = this.sources.get('feeds');
-    const posts = this.sources.get('posts');
 
     return validate(link, feeds)
       .then(() => this.httpClient.get(link))
@@ -95,30 +77,15 @@ export default class RSSFeeder {
       .then((parsedData) => {
         const feed = parsedData.get('channel');
         const feedPosts = Array.from(feed.get('items'));
-
-        return [feed, feedPosts];
-      })
-      .then(([feed, feedPosts]) => {
-        const feedId = this.idGen();
-        const processedPosts = feedPosts.map((post) => {
-          post.set('id', this.idGen());
-          post.set('feedId', feedId);
-          return post;
-        });
-
-        posts.push(...processedPosts);
-        feeds.push(feed);
         feed.delete('items');
-        feed.set('feed', link);
-        feed.set('id', feedId);
 
-        return [feed, processedPosts];
-      })
-      .then(([feed, feedPosts]) => {
-        this.notify('add.feed', feed);
-        this.notify('add.posts', feedPosts);
-      })
-      .then(() => true);
+        const [savedFeed] = this.insert('feeds', [feed], {
+          feed: link,
+        });
+        this.insert('posts', feedPosts, {
+          feedId: savedFeed.get('id'),
+        });
+      });
   }
 
   enableAutoSync() {
@@ -141,7 +108,7 @@ export default class RSSFeeder {
 
   // "private"
 
-  parse(data, feed) {
+  parse(data) {
     const document = this.parser.parseFromString(data, 'text/xml');
     const { documentElement: { tagName } } = document;
     if (tagName !== 'rss') {
@@ -149,7 +116,7 @@ export default class RSSFeeder {
     }
     const channelEl = document.querySelector('channel');
 
-    const parsedFeed = rssToObj(channelEl, feed);
+    const parsedFeed = rssToObj(channelEl);
     const channel = parsedFeed.get('channel');
     if (!channel.has('items')) {
       channel.set('items', []);
@@ -159,45 +126,45 @@ export default class RSSFeeder {
 
   updatePosts() {
     const feeds = this.sources.get('feeds');
-    const posts = this.sources.get('posts');
-    const postGuidsByFeeds = posts.reduce((acc, post) => {
-      const feed = post.get('feed');
-      const guid = post.get('guid');
-      if (acc.has(feed)) {
-        acc.get(feed).push(guid);
-      } else {
-        acc.set(feed, [guid]);
-      }
-      return acc;
-    }, new Map());
 
     const newPostPromises = feeds.map((feed) => {
       const feedLink = feed.get('feed');
       const feedId = feed.get('id');
+      const feedPosts = this.select('posts', 'title', { feedId });
 
       return this.httpClient.get(feedLink)
-        .then((rawData) => this.parse(rawData, feedLink))
+        .then((rawData) => this.parse(rawData))
         .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
-        .then((allPosts) => {
-          const postGuidsInFeed = postGuidsByFeeds.get(feedLink);
-          return allPosts.filter((post) => !postGuidsInFeed.includes(post.get('guid')));
-        })
-        .then((newPosts) => newPosts.map((post) => {
-          post.set('id', this.idGen());
-          post.set('feedId', feedId);
-          return post;
-        }))
-        .then((newPosts) => {
-          if (newPosts.length > 0) {
-            posts.push(...newPosts);
-            this.notify('add.posts', newPosts);
-            return true;
-          }
-          return false;
-        });
+        .then((allPosts) => allPosts.filter((post) => !feedPosts.includes(post.get('title'))))
+        .then((newPosts) => this.insert('posts', newPosts, { feedId }));
     });
 
     return Promise.all(newPostPromises);
+  }
+
+  // -- database
+
+  insert(repositoryName, data, extraFields = {}) {
+    const repository = this.sources.get(repositoryName);
+    const extraFieldsEntries = Object.entries(extraFields);
+    data.forEach((item) => {
+      item.set('id', this.idGen());
+      extraFieldsEntries.forEach(([key, value]) => item.set(key, value));
+    });
+    repository.push(...data);
+
+    this.notify(`add.${repositoryName}`, data);
+
+    return data;
+  }
+
+  select(repositoryName, fieldName, where) {
+    const data = this.sources.get(repositoryName);
+    const wheres = Object.entries(where);
+
+    return data
+      .filter((item) => wheres.every(([whereKey, whereValue]) => item.get(whereKey) === whereValue))
+      .map((item) => item.get(fieldName));
   }
 
   // -- observer
