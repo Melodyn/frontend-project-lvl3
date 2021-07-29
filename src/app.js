@@ -6,7 +6,6 @@ import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
 const run = () => {
-  console.log('\n', `${'-'.repeat(15)} App Started ${'-'.repeat(15)}`, '\n');
   const config = {
     NODE_ENV: process.env.NODE_ENV,
     RSS_SYNC_PERIOD: 5000,
@@ -32,11 +31,9 @@ const run = () => {
       },
     },
   };
-  console.log('state', state);
 
   const i18n = i18next.createInstance();
   const rssFeeder = new RSSFeeder(config);
-  console.log('Init rssFeeder.sources', rssFeeder.sources);
 
   return i18n
     .init({

@@ -93,7 +93,6 @@ export default class RSSFeeder {
       ['add.feed', []],
       ['add.posts', []],
     ]);
-    console.log('Created RSSFeeder', this.sources);
   }
 
   validateSync(link) {
@@ -119,8 +118,6 @@ export default class RSSFeeder {
     return this.httpClient.get(link)
       .then((rawData) => {
         const parsedData = this.parse(rawData, link, true);
-        console.log('---> rawData', rawData);
-        console.log('---> parsedData', JSON.stringify(parsedData, null, 1));
         return this.parse(rawData, link);
       })
       .then((parsedData) => {

@@ -41,7 +41,6 @@ export default class Form {
   constructor(services) {
     this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
-    console.log('Form rssFeeder.sources', this.rssFeeder.sources);
     this.elements = getElements();
   }
 
@@ -67,14 +66,11 @@ export default class Form {
       const url = form.get('url');
       if (!url) return;
 
-      console.log(`triggered form submit in state ${view.uiState.form.state}`);
       view.uiState.form.state = 'processing';
 
       try {
-        console.log('validate', { url });
         rssFeeder.validateSync(url);
       } catch (err) {
-        console.log('not valid', { url }, err.message);
         if (err instanceof AppError) {
           view.uiState.form.errorType = err.errorType;
         } else {
@@ -85,15 +81,12 @@ export default class Form {
         return;
       }
 
-      console.log('add', { url });
-
       rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;
           view.uiState.form.state = 'success';
         })
         .catch((err) => {
-          console.log('addByUrl error', { url }, err.message);
           if (err instanceof AppError) {
             view.uiState.form.errorType = err.errorType;
           } else {
