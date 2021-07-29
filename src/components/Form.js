@@ -67,19 +67,6 @@ export default class Form {
 
       view.uiState.form.state = 'processing';
 
-      try {
-        rssFeeder.validateSync(url);
-      } catch (err) {
-        if (err instanceof AppError) {
-          view.uiState.form.errorType = err.errorType;
-        } else {
-          console.error(err);
-          view.uiState.form.errorType = 'loading';
-        }
-        view.uiState.form.state = 'error';
-        return;
-      }
-
       rssFeeder.addByUrl(url)
         .then(() => {
           view.uiState.form.errorType = null;

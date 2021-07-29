@@ -35,46 +35,20 @@ const rssToObj = (rootElement, feed) => {
   }
 };
 
-const rssToJSON = (rootElement, feed) => {
-  const iter = (element, accum) => {
-    const key = element.tagName;
-    const value = (element.children.length === 0)
-      ? element.textContent
-      : Array.from(element.children).reduce((acc, item) => iter(item, acc), {});
-
-    if (key === 'item') {
-      const items = accum.items || [];
-      value.feed = feed;
-      items.push(value);
-      accum.items = items;
-    } else {
-      accum[key] = value;
-    }
-
-    return accum;
-  };
+const validate = async (link, feeds) => {
+  let url;
 
   try {
-    return iter(rootElement, {});
+    url = new URL(link);
   } catch (err) {
-    throw new AppError(err, 'parsing');
+    throw new AppError(err, 'validation.url');
+  }
+
+  const feedsLinks = feeds.map((feed) => feed.get('feed'));
+  if (feedsLinks.includes(url.toString())) {
+    throw new AppError('Url not unique', 'validation.unique');
   }
 };
-
-// const validate = async (link, feeds) => {
-//   let url;
-//
-//   try {
-//     url = new URL(link);
-//   } catch (err) {
-//     throw new AppError(err, 'validation.url');
-//   }
-//
-//   const feedsLinks = feeds.map((feed) => feed.get('feed'));
-//   if (feedsLinks.includes(url.toString())) {
-//     throw new AppError('Url not unique', 'validation.unique');
-//   }
-// };
 
 export default class RSSFeeder {
   constructor(params = {}) {
@@ -115,11 +89,9 @@ export default class RSSFeeder {
     const feeds = this.sources.get('feeds');
     const posts = this.sources.get('posts');
 
-    return this.httpClient.get(link)
-      .then((rawData) => {
-        const parsedData = this.parse(rawData, link, true);
-        return this.parse(rawData, link);
-      })
+    return validate(link, feeds)
+      .then(() => this.httpClient.get(link))
+      .then((rawData) => this.parse(rawData, link))
       .then((parsedData) => {
         const feed = parsedData.get('channel');
         const feedPosts = Array.from(feed.get('items'));
@@ -169,7 +141,7 @@ export default class RSSFeeder {
 
   // "private"
 
-  parse(data, feed, isJSON = false) {
+  parse(data, feed) {
     const document = this.parser.parseFromString(data, 'text/xml');
     const { documentElement: { tagName } } = document;
     if (tagName !== 'rss') {
@@ -177,8 +149,7 @@ export default class RSSFeeder {
     }
     const channelEl = document.querySelector('channel');
 
-    const parsedFeed = isJSON ? rssToJSON(channelEl, feed) : rssToObj(channelEl, feed);
-    if (isJSON) return parsedFeed;
+    const parsedFeed = rssToObj(channelEl, feed);
     const channel = parsedFeed.get('channel');
     if (!channel.has('items')) {
       channel.set('items', []);
