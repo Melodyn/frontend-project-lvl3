@@ -15,7 +15,7 @@ const createItem = ({ title, description }) => {
   return liEl;
 };
 
-const elements = {
+const getElements = () => ({
   container: createElement('div', {
     classes: ['col-md-4', 'text-end'],
   }),
@@ -25,13 +25,13 @@ const elements = {
   list: createElement('ul', {
     classes: ['list-group', 'list-group-flush'],
   }),
-};
+});
 
 export default class Feeds {
   constructor(services) {
     this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
-    this.elements = elements;
+    this.elements = getElements();
   }
 
   init() {

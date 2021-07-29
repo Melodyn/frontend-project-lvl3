@@ -2,14 +2,14 @@ import createElement from '../libs/createElement.js';
 import Posts from './Posts.js';
 import Feeds from './Feeds.js';
 
-const elements = {
+const getElements = () => ({
   container: createElement('div', {
     classes: ['container', 'pb-5', 'invisible'],
   }),
   row: createElement('div', {
     classes: ['row'],
   }),
-};
+});
 
 export default class Reader {
   constructor(services) {
@@ -18,7 +18,7 @@ export default class Reader {
     this.posts = new Posts(services);
     this.feeds = new Feeds(services);
     this.elements = {
-      ...elements,
+      ...getElements(),
       posts: this.posts.elements,
       feeds: this.feeds.elements,
     };

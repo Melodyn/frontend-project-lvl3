@@ -1,7 +1,7 @@
 import * as bootstrap from 'bootstrap';
 import createElement from '../libs/createElement.js';
 
-const elements = {
+const getElements = () => ({
   container: createElement('div', {
     id: 'modal',
     tabindex: -1,
@@ -41,12 +41,12 @@ const elements = {
     target: '_blank',
     classes: ['btn', 'btn-primary'],
   }),
-};
+});
 
 export default class Modal {
   constructor(services) {
     this.i18n = services.i18n;
-    this.elements = elements;
+    this.elements = getElements();
     this.modal = null;
   }
 

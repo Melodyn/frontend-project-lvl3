@@ -3,7 +3,7 @@ import AppError from '../AppError.js';
 
 const formStatusColors = ['text-primary', 'text-success', 'text-danger'];
 
-const elements = {
+const getElements = () => ({
   form: createElement('form'),
 
   inputGroup: createElement('div', {
@@ -33,7 +33,7 @@ const elements = {
   formStatus: createElement('p', {
     classes: ['me-1', 'mt-0', 'text-break', 'text-end'],
   }),
-};
+});
 
 // ----
 
@@ -42,7 +42,7 @@ export default class Form {
     this.i18n = services.i18n;
     this.rssFeeder = services.rssFeeder;
     console.log('Form rssFeeder.sources', this.rssFeeder.sources);
-    this.elements = elements;
+    this.elements = getElements();
   }
 
   init(view) {

@@ -1,19 +1,19 @@
 import createElement from '../libs/createElement.js';
 import Form from './Form.js';
 
-const elements = {
+const getElements = () => ({
   container: createElement('div', {
     classes: ['container', 'py-5'],
   }),
   appName: createElement('h1', { classes: ['mb-3'] }),
-};
+});
 
 export default class Header {
   constructor(services) {
     this.i18n = services.i18n;
     this.form = new Form(services);
     this.elements = {
-      ...elements,
+      ...getElements(),
       form: this.form.elements,
     };
   }

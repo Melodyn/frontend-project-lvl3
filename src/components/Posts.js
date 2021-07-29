@@ -35,7 +35,7 @@ const createItem = (post, buttonText, view) => {
   return liEl;
 };
 
-const elements = {
+const getElements = () => ({
   container: createElement('div', {
     classes: ['col-md-8', 'order-md-first'],
   }),
@@ -45,7 +45,7 @@ const elements = {
   list: createElement('ul', {
     classes: ['list-group', 'list-group-flush'],
   }),
-};
+});
 
 export default class Posts {
   constructor(services) {
@@ -53,7 +53,7 @@ export default class Posts {
     this.rssFeeder = services.rssFeeder;
     this.modal = new Modal(services);
     this.elements = {
-      ...elements,
+      ...getElements(),
       modal: this.modal.elements,
     };
   }
