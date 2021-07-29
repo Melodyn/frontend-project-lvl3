@@ -32,6 +32,7 @@ const run = () => {
       },
     },
   };
+  console.log('state', state);
 
   const i18n = i18next.createInstance();
   const rssFeeder = new RSSFeeder(config);
