@@ -14,7 +14,6 @@ const getElements = () => ({
     name: 'url',
     type: 'text',
     required: true,
-    autofocus: true,
     'aria-label': 'url',
     classes: ['form-control'],
   }),
@@ -103,6 +102,7 @@ export default class Form {
     this.elements.input.removeAttribute('readonly');
     this.elements.input.classList.remove('is-invalid');
     this.elements.form.reset();
+    this.elements.input.focus();
     this.elements.formStatus.textContent = this.i18n.t(`form.status.${stateName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
     this.elements.formStatus.classList.add('text-success');
@@ -119,6 +119,7 @@ export default class Form {
 
   renderError(stepName) {
     this.elements.button.disabled = false;
+    this.elements.input.focus();
     this.elements.input.removeAttribute('readonly');
     this.elements.formStatus.textContent = this.i18n.t(`form.error.${stepName}`);
     this.elements.formStatus.classList.remove(...formStatusColors);
