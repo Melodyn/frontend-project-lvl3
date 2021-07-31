@@ -27,6 +27,8 @@ const getElements = () => ({
   }),
 });
 
+// ----
+
 export default class Feeds {
   constructor(services) {
     this.i18n = services.i18n;

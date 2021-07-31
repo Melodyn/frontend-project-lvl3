@@ -25,7 +25,7 @@ const initView = (initState, app) => {
         return formHandler();
       case 'newPosts':
         return reader.posts.renderPosts(value, view);
-      case 'uiState.reader.visitedPost':
+      case 'uiState.reader.visitedPostId':
         return reader.posts.renderVisitedPost(value);
       case 'newFeeds':
         return reader.feeds.render(value);

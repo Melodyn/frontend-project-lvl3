@@ -26,10 +26,10 @@ const createItem = (post, buttonText, view) => {
   liEl.append(buttonEl, titleEl);
 
   titleEl.addEventListener('click', () => {
-    view.uiState.reader.visitedPost = { id, visitType: 'away' };
+    view.uiState.reader.visitedPostId = id;
   });
   buttonEl.addEventListener('click', () => {
-    view.uiState.reader.visitedPost = { id, visitType: 'preview' };
+    view.uiState.reader.visitedPostId = id;
   });
 
   return liEl;
@@ -46,6 +46,8 @@ const getElements = () => ({
     classes: ['list-group', 'list-group-flush'],
   }),
 });
+
+// ----
 
 export default class Posts {
   constructor(services) {
@@ -73,10 +75,8 @@ export default class Posts {
     });
   }
 
-  renderVisitedPost(visitedPost) {
-    const { id, visitType } = visitedPost;
-
-    const postEl = this.elements.list.querySelector(`#${id}`);
+  renderVisitedPost(visitedPostId) {
+    const postEl = this.elements.list.querySelector(`#${visitedPostId}`);
     const buttonEl = postEl.querySelector('button');
     const titleEl = postEl.querySelector('a');
 
@@ -85,12 +85,10 @@ export default class Posts {
     buttonEl.classList.remove('btn-outline-primary');
     buttonEl.classList.add('btn-outline-secondary');
 
-    if (visitType === 'preview') {
-      const title = titleEl.textContent;
-      const { description } = postEl.dataset;
-      const link = titleEl.href;
+    const title = titleEl.textContent;
+    const { description } = postEl.dataset;
+    const link = titleEl.href;
 
-      this.modal.render(title, description, link);
-    }
+    this.modal.render(title, description, link);
   }
 }

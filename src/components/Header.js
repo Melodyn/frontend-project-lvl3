@@ -8,6 +8,8 @@ const getElements = () => ({
   appName: createElement('h1', { classes: ['mb-3'] }),
 });
 
+// ----
+
 export default class Header {
   constructor(services) {
     this.i18n = services.i18n;

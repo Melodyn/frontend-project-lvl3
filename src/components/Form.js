@@ -5,7 +5,7 @@ const formStatusColors = ['text-primary', 'text-success', 'text-danger'];
 
 const getElements = () => ({
   form: createElement('form'),
-
+  // interactive
   inputGroup: createElement('div', {
     classes: ['input-group', 'input-group-lg', 'py-2'],
   }),
@@ -24,7 +24,7 @@ const getElements = () => ({
     'aria-label': 'add',
     classes: ['btn', 'btn-primary'],
   }),
-
+  // texts
   exampleContainer: createElement('p', {
     classes: ['ms-1', 'my-1', 'fw-bold', 'text-break', 'text-secondary'],
   }),

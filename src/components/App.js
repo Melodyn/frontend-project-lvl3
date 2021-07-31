@@ -7,6 +7,8 @@ const getElements = () => ({
   body: document.querySelector('body'),
 });
 
+// ----
+
 export default class App {
   constructor(services) {
     this.i18n = services.i18n;

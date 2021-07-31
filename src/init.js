@@ -5,11 +5,12 @@ import initView from './initView.js';
 import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
-const run = () => {
+const init = () => {
   const config = {
     NODE_ENV: process.env.NODE_ENV,
     RSS_SYNC_PERIOD: 5000,
     RSS_PROXY_URL: 'https://hexlet-allorigins.herokuapp.com',
+    RSS_PROXY_URL_PARAMS: { disableCache: true },
   };
 
   const state = {
@@ -27,7 +28,7 @@ const run = () => {
       },
       reader: {
         isHidden: true,
-        visitedPost: {},
+        visitedPostId: null,
       },
     },
   };
@@ -52,4 +53,4 @@ const run = () => {
     });
 };
 
-export default run;
+export default init;

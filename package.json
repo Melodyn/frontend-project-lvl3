@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "RSS aggregator",
-  "main": "src/app.js",
+  "main": "src/init.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,20 +20,19 @@
   },
   "homepage": "https://github.com/Melodyn/frontend-project-lvl3#readme",
   "dependencies": {
-    "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
-    "css-loader": "^6.0.0",
-    "html-webpack-plugin": "^5.3.2",
     "i18next": "^20.3.3",
-    "on-change": "^3.0.2",
-    "style-loader": "^3.1.0",
-    "webpack": "^5.45.0",
-    "webpack-cli": "^4.7.2"
+    "on-change": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.4"
+    "eslint-plugin-import": "^2.23.4",
+    "css-loader": "^6.0.0",
+    "style-loader": "^3.1.0",
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.45.0",
+    "webpack-cli": "^4.7.2"
   }
 }

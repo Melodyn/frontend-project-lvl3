@@ -43,6 +43,8 @@ const getElements = () => ({
   }),
 });
 
+// ----
+
 export default class Modal {
   constructor(services) {
     this.i18n = services.i18n;

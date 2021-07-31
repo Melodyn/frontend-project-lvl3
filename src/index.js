@@ -1,3 +1,3 @@
-import run from './app.js';
+import init from './init.js';
 
-run().catch(console.error);
+init().catch(console.error);
