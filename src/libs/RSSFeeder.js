@@ -49,6 +49,8 @@ const validate = async (link, feeds) => {
   }
 };
 
+// ----
+
 export default class RSSFeeder {
   constructor(params = {}) {
     this.syncPeriod = params.RSS_SYNC_PERIOD;
