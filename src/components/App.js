@@ -22,18 +22,18 @@ export default class App {
     };
   }
 
-  init(view) {
-    this.header.init(view);
-    this.reader.init(view);
+  init(state) {
+    this.header.init(state);
+    this.reader.init(state);
 
     this.elements.title.textContent = this.i18n.t('appName');
-    this.elements.html.setAttribute('lang', view.app.lng);
+    this.elements.html.setAttribute('lang', state.app.lng);
     this.elements.body.append(
       this.elements.modal.container,
       this.elements.header.container,
       this.elements.reader.container,
     );
 
-    view.app.state = 'started';
+    state.app.state = 'started';
   }
 }

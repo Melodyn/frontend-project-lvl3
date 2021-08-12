@@ -1,7 +1,7 @@
 import createElement from '../libs/createElement.js';
 import Modal from './Modal.js';
 
-const createItem = (post, buttonText, view) => {
+const createItem = (post, buttonText, state) => {
   const description = post.get('description');
   const title = post.get('title');
   const link = post.get('link');
@@ -26,10 +26,10 @@ const createItem = (post, buttonText, view) => {
   liEl.append(buttonEl, titleEl);
 
   titleEl.addEventListener('click', () => {
-    view.uiState.reader.visitedPostId = id;
+    state.uiState.reader.visitedPostId = id;
   });
   buttonEl.addEventListener('click', () => {
-    view.uiState.reader.visitedPostId = id;
+    state.uiState.reader.visitedPostId = id;
   });
 
   return liEl;

@@ -26,7 +26,7 @@ export default class Reader {
     };
   }
 
-  init(view) {
+  init(state) {
     this.posts.init();
     this.feeds.init();
 
@@ -37,13 +37,13 @@ export default class Reader {
     this.elements.container.append(this.elements.row);
 
     this.rssFeeder.addEventListener('add.feeds', (feeds) => {
-      if (view.uiState.reader.isHidden) {
-        view.uiState.reader.isHidden = false;
+      if (state.uiState.reader.isHidden) {
+        state.uiState.reader.isHidden = false;
       }
-      view.newFeeds = feeds;
+      state.newFeeds = feeds;
     });
     this.rssFeeder.addEventListener('add.posts', (posts) => {
-      view.newPosts = posts.reverse();
+      state.newPosts = posts.reverse();
     });
   }
 

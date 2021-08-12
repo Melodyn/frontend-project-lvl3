@@ -20,8 +20,8 @@ export default class Header {
     };
   }
 
-  init(view) {
-    this.form.init(view);
+  init(state) {
+    this.form.init(state);
 
     this.elements.appName.textContent = this.i18n.t('appName');
     this.elements.container.append(this.elements.appName, this.elements.form.form);

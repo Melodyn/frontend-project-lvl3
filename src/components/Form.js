@@ -44,7 +44,7 @@ export default class Form {
     this.elements = getElements();
   }
 
-  init(view) {
+  init(state) {
     this.elements.button.textContent = this.i18n.t('button.urlAdd');
     this.elements.input.setAttribute('placeholder', this.i18n.t('form.inputPlaceholder'));
     this.elements.exampleText.textContent = this.i18n.t('form.exampleText');
@@ -66,21 +66,21 @@ export default class Form {
       const url = form.get('url');
       if (!url) return;
 
-      view.uiState.form.state = 'processing';
+      state.uiState.form.state = 'processing';
 
       rssFeeder.addByUrl(url)
         .then(() => {
-          view.uiState.form.errorType = null;
-          view.uiState.form.state = 'success';
+          state.uiState.form.errorType = null;
+          state.uiState.form.state = 'success';
         })
         .catch((err) => {
           if (err instanceof AppError) {
-            view.uiState.form.errorType = err.errorType;
+            state.uiState.form.errorType = err.errorType;
           } else {
             console.error(err);
-            view.uiState.form.errorType = 'loading';
+            state.uiState.form.errorType = 'loading';
           }
-          view.uiState.form.state = 'error';
+          state.uiState.form.state = 'error';
         });
     });
   }
