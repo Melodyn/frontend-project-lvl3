@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import i18next from 'i18next';
 import resources from './locales/index.js';
-import initView from './initView.js';
+import initWatchers from './initWatchers.js';
 import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
@@ -12,11 +12,11 @@ const init = () => {
     RSS_PROXY_URL: 'https://hexlet-allorigins.herokuapp.com',
     RSS_PROXY_URL_PARAMS: { disableCache: true },
   };
+  const isProd = (config.NODE_ENV === 'production');
 
-  const state = {
+  const initState = {
     app: {
       state: 'init',
-      isProd: (config.NODE_ENV === 'production'),
       lng: 'ru',
     },
     newFeeds: [],
@@ -38,8 +38,8 @@ const init = () => {
 
   return i18n
     .init({
-      lng: state.app.lng,
-      debug: !state.app.isProd,
+      lng: initState.app.lng,
+      debug: !isProd,
       resources,
     })
     .then(() => {
@@ -47,8 +47,8 @@ const init = () => {
         i18n,
         rssFeeder,
       });
-      const view = initView(state, app);
-      app.init(view);
+      const state = initWatchers(initState, app);
+      app.init(state);
       rssFeeder.enableAutoSync();
     });
 };

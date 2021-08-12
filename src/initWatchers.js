@@ -1,6 +1,6 @@
 import onChange from 'on-change';
 
-const initView = (initState, app) => {
+const initWatchers = (initState, app) => {
   const { header: { form }, reader } = app;
 
   const formHandler = () => {
@@ -18,13 +18,13 @@ const initView = (initState, app) => {
     }
   };
 
-  const view = onChange(initState, (path, value) => {
+  const state = onChange(initState, (path, value) => {
     switch (path) {
       case 'app.state':
       case 'uiState.form.state':
         return formHandler();
       case 'newPosts':
-        return reader.posts.renderPosts(value, view);
+        return reader.posts.renderPosts(value, state);
       case 'uiState.reader.visitedPostId':
         return reader.posts.renderVisitedPost(value);
       case 'newFeeds':
@@ -36,7 +36,7 @@ const initView = (initState, app) => {
     }
   });
 
-  return view;
+  return state;
 };
 
-export default initView;
+export default initWatchers;
