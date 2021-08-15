@@ -4,7 +4,7 @@ export default {
   mode: process.env.NODE_ENV,
   plugins: [
     new Hwp({
-      favicon: './src/icon.ico',
+      favicon: './src/icon.svg',
       template: 'index.html',
     }),
   ],
