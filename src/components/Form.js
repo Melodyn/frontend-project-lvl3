@@ -68,7 +68,7 @@ export default class Form {
 
       state.uiState.form.state = 'processing';
 
-      rssFeeder.addByUrl(url)
+      rssFeeder.addByUrl(url, state.feeds)
         .then(() => {
           state.uiState.form.errorType = null;
           state.uiState.form.state = 'success';

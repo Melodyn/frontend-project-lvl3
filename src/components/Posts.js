@@ -26,10 +26,10 @@ const createItem = (post, buttonText, state) => {
   liEl.append(buttonEl, titleEl);
 
   titleEl.addEventListener('click', () => {
-    state.uiState.reader.visitedPostId = id;
+    state.uiState.reader.visitedPosts.push(id);
   });
   buttonEl.addEventListener('click', () => {
-    state.uiState.reader.visitedPostId = id;
+    state.uiState.reader.visitedPosts.push(id);
   });
 
   return liEl;

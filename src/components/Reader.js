@@ -37,13 +37,11 @@ export default class Reader {
     this.elements.container.append(this.elements.row);
 
     this.rssFeeder.addEventListener('add.feeds', (feeds) => {
-      if (state.uiState.reader.isHidden) {
-        state.uiState.reader.isHidden = false;
-      }
-      state.newFeeds = feeds;
+      state.feeds.push(...feeds);
     });
     this.rssFeeder.addEventListener('add.posts', (posts) => {
-      state.newPosts = posts.reverse();
+      const reversedPosts = posts.reverse();
+      state.posts.push(...reversedPosts);
     });
   }
 

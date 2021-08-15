@@ -45,6 +45,8 @@ const validate = (url, urls) => yup
     throw new AppError(err.message, `validation.${err.path}`);
   });
 
+// ----
+
 export default class RSSFeeder {
   constructor(params = {}) {
     this.syncPeriod = params.RSS_SYNC_PERIOD;
@@ -54,18 +56,13 @@ export default class RSSFeeder {
     this.httpClient = createHTTPClient(params);
 
     this.parser = new DOMParser();
-    this.sources = new Map([
-      ['feeds', []],
-      ['posts', []],
-    ]);
     this.listeners = new Map([
       ['add.feeds', []],
       ['add.posts', []],
     ]);
   }
 
-  addByUrl(link) {
-    const feeds = this.sources.get('feeds');
+  addByUrl(link, feeds) {
     const urls = feeds.map((feed) => feed.get('feed'));
 
     return validate(link, urls)
@@ -90,12 +87,12 @@ export default class RSSFeeder {
     listeners.push(listener);
   }
 
-  enableAutoSync() {
+  enableAutoSync(feeds, posts) {
     this.autoSyncState = 'run';
 
     const sync = () => {
       setTimeout(() => ((this.autoSyncState === 'run')
-        ? this.updatePosts()
+        ? this.updatePosts(feeds, posts)
           .then(() => sync())
           .catch((err) => {
             console.error(err);
@@ -112,9 +109,9 @@ export default class RSSFeeder {
 
   parse(data) {
     const document = this.parser.parseFromString(data, 'text/xml');
-    const { documentElement: { tagName } } = document;
-    if (tagName !== 'rss') {
-      throw new AppError(`Data format is not RSS, is ${tagName}`, 'parsing');
+    const parserError = document.querySelector('parsererror');
+    if (parserError !== null) {
+      throw new AppError('Data format is not RSS', 'parsing');
     }
     const channelEl = document.querySelector('channel');
 
@@ -127,13 +124,13 @@ export default class RSSFeeder {
     return parsedFeed;
   }
 
-  updatePosts() {
-    const feeds = this.sources.get('feeds');
-
+  updatePosts(feeds, posts) {
     const newPostPromises = feeds.map((feed) => {
       const feedLink = feed.get('feed');
       const feedId = feed.get('id');
-      const feedPosts = this.select('posts', 'title', { feedId });
+      const feedPosts = posts
+        .filter((post) => post.get('feedId') === feedId)
+        .map((post) => post.get('title'));
 
       return this.httpClient.get(feedLink)
         .then((rawData) => this.parse(rawData))
@@ -148,26 +145,15 @@ export default class RSSFeeder {
   // -- database
 
   insert(repositoryName, data, extraFields = {}) {
-    const repository = this.sources.get(repositoryName);
     const extraFieldsEntries = Object.entries(extraFields);
     data.forEach((item) => {
       item.set('id', this.idGen());
       extraFieldsEntries.forEach(([key, value]) => item.set(key, value));
     });
-    repository.push(...data);
 
     this.notify(`add.${repositoryName}`, data);
 
     return data;
-  }
-
-  select(repositoryName, fieldName, where) {
-    const data = this.sources.get(repositoryName);
-    const wheres = Object.entries(where);
-
-    return data
-      .filter((item) => wheres.every(([whereKey, whereValue]) => item.get(whereKey) === whereValue))
-      .map((item) => item.get(fieldName));
   }
 
   // -- observer

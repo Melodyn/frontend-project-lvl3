@@ -19,8 +19,8 @@ const init = () => {
       state: 'init',
       lng: 'ru',
     },
-    newFeeds: [],
-    newPosts: [],
+    feeds: [],
+    posts: [],
     uiState: {
       form: {
         state: 'ready',
@@ -28,7 +28,7 @@ const init = () => {
       },
       reader: {
         isHidden: true,
-        visitedPostId: null,
+        visitedPosts: [],
       },
     },
   };
@@ -49,7 +49,7 @@ const init = () => {
       });
       const state = initWatchers(initState, app);
       app.init(state);
-      rssFeeder.enableAutoSync();
+      rssFeeder.enableAutoSync(state.feeds, state.posts);
     });
 };
 

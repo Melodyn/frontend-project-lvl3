@@ -18,17 +18,17 @@ const initWatchers = (initState, app) => {
     }
   };
 
-  const state = onChange(initState, (path, value) => {
+  const state = onChange(initState, (path, allData, previousData, newData) => {
     switch (path) {
       case 'app.state':
       case 'uiState.form.state':
         return formHandler();
-      case 'newPosts':
-        return reader.posts.renderPosts(value, state);
-      case 'uiState.reader.visitedPostId':
-        return reader.posts.renderVisitedPost(value);
-      case 'newFeeds':
-        return reader.feeds.render(value);
+      case 'posts':
+        return reader.posts.renderPosts(newData.args, state);
+      case 'uiState.reader.visitedPosts':
+        return reader.posts.renderVisitedPost(newData.args);
+      case 'feeds':
+        return reader.feeds.render(newData.args);
       case 'uiState.reader.isHidden':
         return reader.render();
       default:
