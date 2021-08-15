@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import createHTTPClient from './createHTTPClient.js';
 import AppError from '../AppError.js';
 
@@ -34,20 +35,15 @@ const rssToObj = (rootElement) => {
   }
 };
 
-const validate = async (link, feeds) => {
-  let url;
-
-  try {
-    url = new URL(link);
-  } catch (err) {
-    throw new AppError(err, 'validation.url');
-  }
-
-  const feedsLinks = feeds.map((feed) => feed.get('feed'));
-  if (feedsLinks.includes(url.toString())) {
-    throw new AppError('Url not unique', 'validation.unique');
-  }
-};
+const validate = (url, urls) => yup
+  .object({
+    url: yup.string().url().required(),
+    unique: yup.mixed().notOneOf(urls, 'Url not unique').required(),
+  })
+  .validate({ url, unique: url })
+  .catch((err) => {
+    throw new AppError(err.message, `validation.${err.path}`);
+  });
 
 export default class RSSFeeder {
   constructor(params = {}) {
@@ -70,8 +66,9 @@ export default class RSSFeeder {
 
   addByUrl(link) {
     const feeds = this.sources.get('feeds');
+    const urls = feeds.map((feed) => feed.get('feed'));
 
-    return validate(link, feeds)
+    return validate(link, urls)
       .then(() => this.httpClient.get(link))
       .then((rawData) => this.parse(rawData, link))
       .then((parsedData) => {
@@ -86,6 +83,11 @@ export default class RSSFeeder {
           feedId: savedFeed.get('id'),
         });
       });
+  }
+
+  addEventListener(event, listener) {
+    const listeners = this.listeners.get(event);
+    listeners.push(listener);
   }
 
   enableAutoSync() {
@@ -121,6 +123,7 @@ export default class RSSFeeder {
     if (!channel.has('items')) {
       channel.set('items', []);
     }
+
     return parsedFeed;
   }
 
@@ -168,11 +171,6 @@ export default class RSSFeeder {
   }
 
   // -- observer
-
-  addEventListener(event, listener) {
-    const listeners = this.listeners.get(event);
-    listeners.push(listener);
-  }
 
   notify(event, data) {
     const listeners = this.listeners.get(event);
