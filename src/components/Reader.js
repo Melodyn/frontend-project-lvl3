@@ -4,7 +4,7 @@ import Feeds from './Feeds.js';
 
 const getElements = () => ({
   container: createElement('div', {
-    classes: ['container', 'pb-5', 'invisible'],
+    classes: ['container', 'pb-5'],
   }),
   row: createElement('div', {
     classes: ['row'],
@@ -43,9 +43,5 @@ export default class Reader {
       const reversedPosts = posts.reverse();
       state.posts.push(...reversedPosts);
     });
-  }
-
-  render() {
-    this.elements.container.classList.remove('invisible');
   }
 }

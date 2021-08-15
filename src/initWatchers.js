@@ -8,11 +8,14 @@ const initWatchers = (initState, app) => {
     switch (state) {
       case 'ready':
       case 'success':
-        return form.renderEmpty(state);
+        form.renderEmpty(state);
+        break;
       case 'processing':
-        return form.renderProcess();
+        form.renderProcess();
+        break;
       case 'error':
-        return form.renderError(errorType);
+        form.renderError(errorType);
+        break;
       default:
         throw new Error(`Unexpected form state "${state}"`);
     }
@@ -22,17 +25,19 @@ const initWatchers = (initState, app) => {
     switch (path) {
       case 'app.state':
       case 'uiState.form.state':
-        return formHandler();
+        formHandler();
+        break;
       case 'posts':
-        return reader.posts.renderPosts(newData.args, state);
+        reader.posts.renderPosts(newData.args, state);
+        break;
       case 'uiState.reader.visitedPosts':
-        return reader.posts.renderVisitedPost(newData.args);
+        reader.posts.renderVisitedPost(newData.args);
+        break;
       case 'feeds':
-        return reader.feeds.render(newData.args);
-      case 'uiState.reader.isHidden':
-        return reader.render();
+        reader.feeds.render(newData.args);
+        break;
       default:
-        return false;
+        break;
     }
   });
 

@@ -142,8 +142,6 @@ export default class RSSFeeder {
     return Promise.all(newPostPromises);
   }
 
-  // -- database
-
   insert(repositoryName, data, extraFields = {}) {
     const extraFieldsEntries = Object.entries(extraFields);
     data.forEach((item) => {
@@ -155,8 +153,6 @@ export default class RSSFeeder {
 
     return data;
   }
-
-  // -- observer
 
   notify(event, data) {
     const listeners = this.listeners.get(event);
