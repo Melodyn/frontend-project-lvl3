@@ -29,7 +29,10 @@ const getElements = () => ({
   title: createElement('h5', {
     classes: ['modal-title'],
   }),
-  description: createElement('p'),
+  description: createElement('p', {
+    classes: ['text-break'],
+    style: 'white-space: pre-wrap;',
+  }),
   // buttons
   buttonClose: createElement('button', {
     type: 'button',
