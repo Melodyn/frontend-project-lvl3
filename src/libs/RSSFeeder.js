@@ -47,6 +47,8 @@ const validate = (url, urls) => yup
 
 // ----
 
+// ----
+
 export default class RSSFeeder {
   constructor(params = {}) {
     this.syncPeriod = params.RSS_SYNC_PERIOD;
