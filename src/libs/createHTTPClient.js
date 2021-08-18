@@ -9,7 +9,7 @@ const createHTTPClient = (config = {}) => {
   const get = (url) => httpClient.get('/get', { params: { url } })
     .then(({ data }) => data.contents)
     .catch((err) => {
-      throw new AppError(err, 'loading');
+      throw new AppError('loading', err);
     });
 
   return { get };

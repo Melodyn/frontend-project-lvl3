@@ -1,5 +1,5 @@
 export default class AppError extends Error {
-  constructor(originalError, errorType) {
+  constructor(errorType, originalError = '') {
     super(originalError);
     this.errorType = errorType;
   }

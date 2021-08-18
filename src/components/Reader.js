@@ -26,7 +26,7 @@ export default class Reader {
     };
   }
 
-  init(state) {
+  init() {
     this.posts.init();
     this.feeds.init();
 
@@ -35,13 +35,5 @@ export default class Reader {
       this.elements.posts.container,
     );
     this.elements.container.append(this.elements.row);
-
-    this.rssFeeder.addEventListener('add.feeds', (feeds) => {
-      state.feeds.push(...feeds);
-    });
-    this.rssFeeder.addEventListener('add.posts', (posts) => {
-      const reversedPosts = posts.reverse();
-      state.posts.push(...reversedPosts);
-    });
   }
 }

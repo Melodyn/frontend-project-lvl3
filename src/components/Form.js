@@ -1,5 +1,4 @@
 import createElement from '../libs/createElement.js';
-import AppError from '../AppError.js';
 
 const formStatusColors = ['text-primary', 'text-success', 'text-danger'];
 
@@ -66,21 +65,23 @@ export default class Form {
       const url = form.get('url');
       if (!url) return;
 
-      state.uiState.form.state = 'processing';
+      state.form.state = 'processing';
 
       rssFeeder.addByUrl(url, state.feeds)
-        .then(() => {
-          state.uiState.form.errorType = null;
-          state.uiState.form.state = 'success';
-        })
-        .catch((err) => {
-          if (err instanceof AppError) {
-            state.uiState.form.errorType = err.errorType;
+        .then((result) => {
+          if (result.isError) {
+            state.form.errorType = result.errorType;
+            state.form.state = 'error';
           } else {
-            console.error(err);
-            state.uiState.form.errorType = 'loading';
+            state.form.errorType = null;
+            state.form.state = 'success';
+
+            const { feed, feedPosts } = result;
+            const reversedPosts = feedPosts.reverse();
+
+            state.feeds.push(feed);
+            state.posts.push(...reversedPosts);
           }
-          state.uiState.form.state = 'error';
         });
     });
   }

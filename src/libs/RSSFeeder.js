@@ -31,21 +31,18 @@ const rssToObj = (rootElement) => {
   try {
     return iter(rootElement, new Map());
   } catch (err) {
-    throw new AppError(err, 'parsing');
+    throw new AppError('parsing', err);
   }
 };
 
 const validate = (url, urls) => yup
-  .object({
-    url: yup.string().url().required(),
-    unique: yup.mixed().notOneOf(urls, 'Url not unique').required(),
-  })
-  .validate({ url, unique: url })
-  .catch((err) => {
-    throw new AppError(err.message, `validation.${err.path}`);
-  });
-
-// ----
+  .string()
+  .url('validation.url')
+  .notOneOf(urls, 'validation.unique')
+  .required('validation.url')
+  .validate(url)
+  .then(() => null)
+  .catch((e) => ({ isError: true, errorType: e.message }));
 
 // ----
 
@@ -66,36 +63,47 @@ export default class RSSFeeder {
 
   addByUrl(link, feeds) {
     const urls = feeds.map((feed) => feed.get('feed'));
-
-    return validate(link, urls)
-      .then(() => this.httpClient.get(link))
-      .then((rawData) => this.parse(rawData, link))
+    const load = () => this.httpClient.get(link)
+      .then((rawData) => this.parse(rawData))
       .then((parsedData) => {
         const feed = parsedData.get('channel');
         const feedPosts = Array.from(feed.get('items'));
         feed.delete('items');
 
-        const [savedFeed] = this.insert('feeds', [feed], {
-          feed: link,
-        });
-        this.insert('posts', feedPosts, {
-          feedId: savedFeed.get('id'),
-        });
+        const feedId = this.idGen();
+        feed.set('id', feedId);
+        feed.set('feed', link);
+
+        feedPosts.forEach((post) => post.set('id', this.idGen()));
+        feedPosts.forEach((post) => post.set('feedId', feedId));
+
+        return { feed, feedPosts };
+      })
+      .catch((err) => {
+        if (!(err instanceof AppError)) {
+          console.error(err);
+          return { isError: true, errorType: 'loading' };
+        }
+
+        return { isError: true, errorType: err.errorType };
       });
+
+    return validate(link, urls)
+      .then((error) => (error || load()));
   }
 
-  addEventListener(event, listener) {
-    const listeners = this.listeners.get(event);
-    listeners.push(listener);
-  }
-
-  enableAutoSync(feeds, posts) {
+  enableAutoSync(feeds, posts, cb) {
     this.autoSyncState = 'run';
 
     const sync = () => {
       setTimeout(() => ((this.autoSyncState === 'run')
         ? this.updatePosts(feeds, posts)
-          .then(() => sync())
+          .then((result) => {
+            if (!result.isError) {
+              cb(result);
+            }
+            return sync();
+          })
           .catch((err) => {
             console.error(err);
             return sync();
@@ -113,7 +121,7 @@ export default class RSSFeeder {
     const document = this.parser.parseFromString(data, 'text/xml');
     const parserError = document.querySelector('parsererror');
     if (parserError !== null) {
-      throw new AppError('Data format is not RSS', 'parsing');
+      throw new AppError('parsing');
     }
     const channelEl = document.querySelector('channel');
 
@@ -136,28 +144,14 @@ export default class RSSFeeder {
 
       return this.httpClient.get(feedLink)
         .then((rawData) => this.parse(rawData))
-        .then((parsedData) => Array.from(parsedData.get('channel').get('items')))
-        .then((allPosts) => allPosts.filter((post) => !feedPosts.includes(post.get('title'))))
-        .then((newPosts) => this.insert('posts', newPosts, { feedId }));
+        .then((parsedData) => {
+          const allPosts = Array.from(parsedData.get('channel').get('items'));
+          const newPosts = allPosts.filter((post) => !feedPosts.includes(post.get('title')));
+
+          return newPosts.map((post) => post.set('feedId', feedId));
+        });
     });
 
-    return Promise.all(newPostPromises);
-  }
-
-  insert(repositoryName, data, extraFields = {}) {
-    const extraFieldsEntries = Object.entries(extraFields);
-    data.forEach((item) => {
-      item.set('id', this.idGen());
-      extraFieldsEntries.forEach(([key, value]) => item.set(key, value));
-    });
-
-    this.notify(`add.${repositoryName}`, data);
-
-    return data;
-  }
-
-  notify(event, data) {
-    const listeners = this.listeners.get(event);
-    listeners.forEach((listener) => listener(data));
+    return Promise.all(newPostPromises).then((newPosts) => newPosts.flat());
   }
 }

@@ -5,15 +5,15 @@ import initWatchers from './initWatchers.js';
 import App from './components/App.js';
 import RSSFeeder from './libs/RSSFeeder.js';
 
-const init = () => {
-  const config = {
-    NODE_ENV: process.env.NODE_ENV,
-    RSS_SYNC_PERIOD: 5000,
-    RSS_PROXY_URL: 'https://hexlet-allorigins.herokuapp.com',
-    RSS_PROXY_URL_PARAMS: { disableCache: true },
-  };
-  const isProd = (config.NODE_ENV === 'production');
+const config = {
+  NODE_ENV: process.env.NODE_ENV,
+  RSS_SYNC_PERIOD: 5000,
+  RSS_PROXY_URL: 'https://hexlet-allorigins.herokuapp.com',
+  RSS_PROXY_URL_PARAMS: { disableCache: true },
+};
+const isProd = (config.NODE_ENV === 'production');
 
+const init = () => {
   const initState = {
     app: {
       state: 'init',
@@ -21,14 +21,16 @@ const init = () => {
     },
     feeds: [],
     posts: [],
+    form: {
+      state: 'ready',
+      errorType: null,
+    },
     uiState: {
-      form: {
-        state: 'ready',
-        errorType: null,
+      modal: {
+        visitedPostId: null,
       },
       reader: {
-        isHidden: true,
-        visitedPosts: [],
+        visitedPosts: new Set(),
       },
     },
   };
@@ -49,7 +51,11 @@ const init = () => {
       });
       const state = initWatchers(initState, app);
       app.init(state);
-      rssFeeder.enableAutoSync(state.feeds, state.posts);
+      rssFeeder.enableAutoSync(
+        state.feeds,
+        state.posts,
+        (feedPosts) => state.posts.push(...(feedPosts.reverse())),
+      );
     });
 };
 

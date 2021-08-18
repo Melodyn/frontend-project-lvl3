@@ -2,14 +2,12 @@ import createElement from '../libs/createElement.js';
 import Modal from './Modal.js';
 
 const createItem = (post, buttonText, state) => {
-  const description = post.get('description');
   const title = post.get('title');
   const link = post.get('link');
-  const id = `post${post.get('id')}`;
+  const id = post.get('id');
 
   const liEl = createElement('li', {
-    id,
-    'data-description': description,
+    'data-id': id,
     classes: ['list-group-item', 'd-flex', 'ps-0', 'py-3'],
   });
   const titleEl = createElement('a', {
@@ -26,10 +24,12 @@ const createItem = (post, buttonText, state) => {
   liEl.append(buttonEl, titleEl);
 
   titleEl.addEventListener('click', () => {
-    state.uiState.reader.visitedPosts.push(id);
+    state.uiState.modal.visitedPostId = id;
+    state.uiState.reader.visitedPosts.add(id);
   });
   buttonEl.addEventListener('click', () => {
-    state.uiState.reader.visitedPosts.push(id);
+    state.uiState.modal.visitedPostId = id;
+    state.uiState.reader.visitedPosts.add(id);
   });
 
   return liEl;
@@ -66,17 +66,17 @@ export default class Posts {
     this.elements.container.append(this.elements.header, this.elements.list);
   }
 
-  renderPosts(posts, view) {
+  renderPosts(posts, state) {
     const buttonText = this.i18n.t('button.show');
 
     posts.forEach((post) => {
-      const itemEl = createItem(post, buttonText, view);
+      const itemEl = createItem(post, buttonText, state);
       this.elements.list.prepend(itemEl);
     });
   }
 
-  renderVisitedPost(visitedPostId) {
-    const postEl = this.elements.list.querySelector(`#${visitedPostId}`);
+  renderVisitedPost(visitedPostId, state) {
+    const postEl = this.elements.list.querySelector(`[data-id="${visitedPostId}"`);
     const buttonEl = postEl.querySelector('button');
     const titleEl = postEl.querySelector('a');
 
@@ -86,8 +86,9 @@ export default class Posts {
     buttonEl.classList.add('btn-outline-secondary');
 
     const title = titleEl.textContent;
-    const { description } = postEl.dataset;
     const link = titleEl.href;
+    const post = Array.from(state.posts).find((item) => item.get('id') === visitedPostId);
+    const description = post.get('description');
 
     this.modal.render(title, description, link);
   }
