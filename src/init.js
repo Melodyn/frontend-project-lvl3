@@ -8,7 +8,7 @@ import RSSFeeder from './libs/RSSFeeder.js';
 const config = {
   NODE_ENV: process.env.NODE_ENV,
   RSS_SYNC_PERIOD: 5000,
-  RSS_PROXY_URL: 'https://hexlet-allorigins.herokuapp.com',
+  RSS_PROXY_URL: 'https://allorigins.hexlet.app',
   RSS_PROXY_URL_PARAMS: { disableCache: true },
 };
 const isProd = (config.NODE_ENV === 'production');
